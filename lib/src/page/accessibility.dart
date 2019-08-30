@@ -58,10 +58,10 @@ class Accessibility {
   /// Parameters:
   ///  - `interestingOnly` Prune uninteresting nodes from the tree. Defaults to `true`.
   ///  - `root` The root DOM element for the snapshot. Defaults to the whole page.
-  Future<AXNode> snapshot({bool interestingOnly, ElementHandle root}) async {
+  Future<AXNode?> snapshot({bool interestingOnly = true, ElementHandle? root}) async {
     interestingOnly ??= true;
     var nodes = await _devTools.accessibility.getFullAXTree();
-    BackendNodeId backendNodeId;
+    BackendNodeId? backendNodeId;
     if (root != null) {
       var node = await _devTools.dom
           .describeNode(objectId: root.remoteObject.objectId);
@@ -70,9 +70,10 @@ class Accessibility {
     var defaultRoot = _AXNode.createTree(nodes);
     var needle = defaultRoot;
     if (backendNodeId != null) {
-      needle = defaultRoot
+      _AXNode? foundNeedle = defaultRoot
           .find((node) => node._payload.backendDOMNodeId == backendNodeId);
       if (needle == null) return null;
+      needle = foundNeedle;
     }
     if (!interestingOnly) return _serializeTree(needle)[0];
 
@@ -85,7 +86,7 @@ class Accessibility {
 }
 
 void _collectInterestingNodes(Set<_AXNode> collection, _AXNode node,
-    {bool insideControl}) {
+    {required bool insideControl}) {
   if (node.isInteresting(insideControl: insideControl)) collection.add(node);
   if (node.isLeafNode) return null;
   insideControl = insideControl || node.isControl;
@@ -94,7 +95,7 @@ void _collectInterestingNodes(Set<_AXNode> collection, _AXNode node,
   }
 }
 
-List<AXNode> _serializeTree(_AXNode node, {Set<_AXNode> whitelistedNodes}) {
+List<AXNode> _serializeTree(_AXNode node, {Set<_AXNode>? whitelistedNodes}) {
   var children = <AXNode>[];
   for (var child in node._children) {
     children.addAll(_serializeTree(child, whitelistedNodes: whitelistedNodes));
@@ -143,7 +144,7 @@ class AXNode {
       hasPopup,
       invalid,
       orientation,
-      List<AXNode> children})
+      List<AXNode>? children})
       : children = children ?? <AXNode>[],
         _properties = {
           'role': role,
@@ -314,7 +315,7 @@ class _AXNode {
     _role = _payload.role?.value as String ?? 'Unknown';
 
     if (_payload.properties != null) {
-      for (var property in _payload.properties) {
+      for (var property in _payload.properties!) {
         if (property.name == AXPropertyName.editable) {
           _richlyEditable = property.value.value == 'richtext';
           _editable = true;
@@ -352,7 +353,7 @@ class _AXNode {
     return _cachedHasFocusableChild;
   }
 
-  _AXNode find(bool Function(_AXNode) predicate) {
+  _AXNode? find(bool Function(_AXNode) predicate) {
     if (predicate(this)) return this;
     for (var child in _children) {
       var result = child.find(predicate);
@@ -425,7 +426,7 @@ class _AXNode {
     }
   }
 
-  bool isInteresting({@required bool insideControl}) {
+  bool isInteresting({required bool insideControl}) {
     var role = _role;
     if (role == 'Ignored') return false;
 
@@ -444,15 +445,15 @@ class _AXNode {
     AXProperty findProperty(AXPropertyName name) => _payload.properties
         .firstWhere((p) => p.name == name, orElse: () => null);
 
-    String stringValue(AXPropertyName name) {
+    String? stringValue(AXPropertyName name) {
       var property = findProperty(name);
-      if (property != null && property.value?.value != null) {
+      if (property != null && property.value.value != null) {
         return '${property.value.value}';
       }
       return null;
     }
 
-    bool boolValue(AXPropertyName name) {
+    bool? boolValue(AXPropertyName name) {
       var property = findProperty(name);
       if (property != null && property.value != null) {
         // WebArea's treat focus differently than other nodes. They report whether their frame  has focus,
@@ -469,7 +470,7 @@ class _AXNode {
       return null;
     }
 
-    TriState triState(AXPropertyName name) {
+    TriState? triState(AXPropertyName name) {
       var property = findProperty(name);
       if (property != null && property.value != null) {
         return TriState._fromString('${property.value.value}');
@@ -477,15 +478,15 @@ class _AXNode {
       return null;
     }
 
-    num numValue(AXPropertyName name) {
+    num? numValue(AXPropertyName name) {
       var property = findProperty(name);
-      if (property != null && property.value?.value is num) {
+      if (property != null && property.value.value is num) {
         return property.value.value as num;
       }
       return null;
     }
 
-    String value(AXPropertyName name) {
+    String? value(AXPropertyName name) {
       var property = findProperty(name);
       if (property != null) {
         if (property.value != null) {
@@ -534,7 +535,7 @@ class _AXNode {
     }
     for (var node in nodeById.values) {
       if (node._payload.childIds != null) {
-        for (var childId in node._payload.childIds) {
+        for (var childId in node._payload.childIds!) {
           node._children.add(nodeById[childId]);
         }
       }

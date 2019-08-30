@@ -11,9 +11,9 @@ class RevisionInfo {
   final int revision;
 
   RevisionInfo(
-      {@required this.executablePath,
-      @required this.folderPath,
-      @required this.revision});
+      {required this.executablePath,
+      required this.folderPath,
+      required this.revision});
 }
 
 const int _lastRevision = 686378;

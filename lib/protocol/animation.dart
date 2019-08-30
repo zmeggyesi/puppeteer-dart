@@ -4,26 +4,36 @@ import '../src/connection.dart';
 import 'dom.dart' as dom;
 import 'runtime.dart' as runtime;
 
+
 class AnimationApi {
   final Client _client;
 
   AnimationApi(this._client);
 
   /// Event for when an animation has been cancelled.
-  Stream<String> get onAnimationCanceled => _client.onEvent
-      .where((event) => event.name == 'Animation.animationCanceled')
-      .map((event) => event.parameters['id'] as String);
+  Stream<String> get onAnimationCanceled =>
+      _client.onEvent.where((event) =>
+      event.name == 'Animation.animationCanceled')
+          .map((event) => event.parameters['id'] as String)
+  ;
+
 
   /// Event for each animation that has been created.
-  Stream<String> get onAnimationCreated => _client.onEvent
-      .where((event) => event.name == 'Animation.animationCreated')
-      .map((event) => event.parameters['id'] as String);
+  Stream<String> get onAnimationCreated =>
+      _client.onEvent.where((event) =>
+      event.name == 'Animation.animationCreated')
+          .map((event) => event.parameters['id'] as String)
+  ;
+
 
   /// Event for animation that has been started.
-  Stream<Animation> get onAnimationStarted => _client.onEvent
-      .where((event) => event.name == 'Animation.animationStarted')
-      .map((event) => Animation.fromJson(
-          event.parameters['animation'] as Map<String, dynamic>));
+  Stream<Animation> get onAnimationStarted =>
+      _client.onEvent.where((event) =>
+      event.name == 'Animation.animationStarted')
+          .map((event) => Animation.fromJson(
+          event.parameters['animation'] as Map<String, dynamic>))
+  ;
+
 
   /// Disables animation domain notifications.
   Future<void> disable() async {
@@ -39,9 +49,7 @@ class AnimationApi {
   /// [id] Id of animation.
   /// Returns: Current time of the page.
   Future<num> getCurrentTime(String id) async {
-    var result = await _client.send('Animation.getCurrentTime', {
-      'id': id,
-    });
+    var result = await _client.send('Animation.getCurrentTime', {'id': id,});
     return result['currentTime'] as num;
   }
 
@@ -55,18 +63,16 @@ class AnimationApi {
   /// Releases a set of animations to no longer be manipulated.
   /// [animations] List of animation ids to seek.
   Future<void> releaseAnimations(List<String> animations) async {
-    await _client.send('Animation.releaseAnimations', {
-      'animations': [...animations],
-    });
+    await _client.send(
+        'Animation.releaseAnimations', {'animations': [...animations],});
   }
 
   /// Gets the remote object of the Animation.
   /// [animationId] Animation id.
   /// Returns: Corresponding remote object.
   Future<runtime.RemoteObject> resolveAnimation(String animationId) async {
-    var result = await _client.send('Animation.resolveAnimation', {
-      'animationId': animationId,
-    });
+    var result = await _client.send(
+        'Animation.resolveAnimation', {'animationId': animationId,});
     return runtime.RemoteObject.fromJson(
         result['remoteObject'] as Map<String, dynamic>);
   }
@@ -75,28 +81,23 @@ class AnimationApi {
   /// [animations] List of animation ids to seek.
   /// [currentTime] Set the current time of each animation.
   Future<void> seekAnimations(List<String> animations, num currentTime) async {
-    await _client.send('Animation.seekAnimations', {
-      'animations': [...animations],
-      'currentTime': currentTime,
-    });
+    await _client.send('Animation.seekAnimations',
+        {'animations': [...animations], 'currentTime': currentTime,});
   }
 
   /// Sets the paused state of a set of animations.
   /// [animations] Animations to set the pause state of.
   /// [paused] Paused state to set to.
   Future<void> setPaused(List<String> animations, bool paused) async {
-    await _client.send('Animation.setPaused', {
-      'animations': [...animations],
-      'paused': paused,
-    });
+    await _client.send('Animation.setPaused',
+        {'animations': [...animations], 'paused': paused,});
   }
 
   /// Sets the playback rate of the document timeline.
   /// [playbackRate] Playback rate for animations on page
   Future<void> setPlaybackRate(num playbackRate) async {
-    await _client.send('Animation.setPlaybackRate', {
-      'playbackRate': playbackRate,
-    });
+    await _client.send(
+        'Animation.setPlaybackRate', {'playbackRate': playbackRate,});
   }
 
   /// Sets the timing of an animation node.
@@ -104,12 +105,10 @@ class AnimationApi {
   /// [duration] Duration of the animation.
   /// [delay] Delay of the animation.
   Future<void> setTiming(String animationId, num duration, num delay) async {
-    await _client.send('Animation.setTiming', {
-      'animationId': animationId,
-      'duration': duration,
-      'delay': delay,
-    });
+    await _client.send('Animation.setTiming',
+        {'animationId': animationId, 'duration': duration, 'delay': delay,});
   }
+
 }
 
 /// Animation instance.
@@ -139,23 +138,14 @@ class Animation {
   final AnimationType type;
 
   /// `Animation`'s source animation node.
-  final AnimationEffect source;
+  final AnimationEffect? source;
 
   /// A unique ID for `Animation` representing the sources that triggered this CSS
   /// animation/transition.
-  final String cssId;
+  final String? cssId;
 
   Animation(
-      {@required this.id,
-      @required this.name,
-      @required this.pausedState,
-      @required this.playState,
-      @required this.playbackRate,
-      @required this.startTime,
-      @required this.currentTime,
-      @required this.type,
-      this.source,
-      this.cssId});
+      {required this.id, required this.name, required this.pausedState, required this.playState, required this.playbackRate, required this.startTime, required this.currentTime, required this.type, this.source, this.cssId});
 
   factory Animation.fromJson(Map<String, dynamic> json) {
     return Animation(
@@ -167,9 +157,8 @@ class Animation {
       startTime: json['startTime'] as num,
       currentTime: json['currentTime'] as num,
       type: AnimationType.fromJson(json['type'] as String),
-      source: json.containsKey('source')
-          ? AnimationEffect.fromJson(json['source'] as Map<String, dynamic>)
-          : null,
+      source: json.containsKey('source') ? AnimationEffect.fromJson(
+          json['source'] as Map<String, dynamic>) : null,
       cssId: json.containsKey('cssId') ? json['cssId'] as String : null,
     );
   }
@@ -184,11 +173,14 @@ class Animation {
       'startTime': startTime,
       'currentTime': currentTime,
       'type': type,
-      if (source != null) 'source': source.toJson(),
-      if (cssId != null) 'cssId': cssId,
+      if (source != null)
+        'source': source.toJson(),
+      if (cssId != null)
+        'cssId': cssId,
     };
   }
 }
+
 
 class AnimationType {
   static const cssTransition = AnimationType._('CSSTransition');
@@ -243,25 +235,16 @@ class AnimationEffect {
   final String fill;
 
   /// `AnimationEffect`'s target node.
-  final dom.BackendNodeId backendNodeId;
+  final dom.BackendNodeId? backendNodeId;
 
   /// `AnimationEffect`'s keyframes.
-  final KeyframesRule keyframesRule;
+  final KeyframesRule? keyframesRule;
 
   /// `AnimationEffect`'s timing function.
   final String easing;
 
   AnimationEffect(
-      {@required this.delay,
-      @required this.endDelay,
-      @required this.iterationStart,
-      @required this.iterations,
-      @required this.duration,
-      @required this.direction,
-      @required this.fill,
-      this.backendNodeId,
-      this.keyframesRule,
-      @required this.easing});
+      {required this.delay, required this.endDelay, required this.iterationStart, required this.iterations, required this.duration, required this.direction, required this.fill, this.backendNodeId, this.keyframesRule, required this.easing});
 
   factory AnimationEffect.fromJson(Map<String, dynamic> json) {
     return AnimationEffect(
@@ -272,13 +255,10 @@ class AnimationEffect {
       duration: json['duration'] as num,
       direction: json['direction'] as String,
       fill: json['fill'] as String,
-      backendNodeId: json.containsKey('backendNodeId')
-          ? dom.BackendNodeId.fromJson(json['backendNodeId'] as int)
-          : null,
-      keyframesRule: json.containsKey('keyframesRule')
-          ? KeyframesRule.fromJson(
-              json['keyframesRule'] as Map<String, dynamic>)
-          : null,
+      backendNodeId: json.containsKey('backendNodeId') ? dom.BackendNodeId
+          .fromJson(json['backendNodeId'] as int) : null,
+      keyframesRule: json.containsKey('keyframesRule') ? KeyframesRule.fromJson(
+          json['keyframesRule'] as Map<String, dynamic>) : null,
       easing: json['easing'] as String,
     );
   }
@@ -293,8 +273,10 @@ class AnimationEffect {
       'direction': direction,
       'fill': fill,
       'easing': easing,
-      if (backendNodeId != null) 'backendNodeId': backendNodeId.toJson(),
-      if (keyframesRule != null) 'keyframesRule': keyframesRule.toJson(),
+      if (backendNodeId != null)
+        'backendNodeId': backendNodeId.toJson(),
+      if (keyframesRule != null)
+        'keyframesRule': keyframesRule.toJson(),
     };
   }
 }
@@ -302,26 +284,26 @@ class AnimationEffect {
 /// Keyframes Rule
 class KeyframesRule {
   /// CSS keyframed animation's name.
-  final String name;
+  final String? name;
 
   /// List of animation keyframes.
   final List<KeyframeStyle> keyframes;
 
-  KeyframesRule({this.name, @required this.keyframes});
+  KeyframesRule({this.name, required this.keyframes});
 
   factory KeyframesRule.fromJson(Map<String, dynamic> json) {
     return KeyframesRule(
       name: json.containsKey('name') ? json['name'] as String : null,
-      keyframes: (json['keyframes'] as List)
-          .map((e) => KeyframeStyle.fromJson(e as Map<String, dynamic>))
-          .toList(),
+      keyframes: (json['keyframes'] as List).map((e) =>
+          KeyframeStyle.fromJson(e as Map<String, dynamic>)).toList(),
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
       'keyframes': keyframes.map((e) => e.toJson()).toList(),
-      if (name != null) 'name': name,
+      if (name != null)
+        'name': name,
     };
   }
 }
@@ -334,7 +316,7 @@ class KeyframeStyle {
   /// `AnimationEffect`'s timing function.
   final String easing;
 
-  KeyframeStyle({@required this.offset, @required this.easing});
+  KeyframeStyle({required this.offset, required this.easing});
 
   factory KeyframeStyle.fromJson(Map<String, dynamic> json) {
     return KeyframeStyle(
@@ -350,3 +332,4 @@ class KeyframeStyle {
     };
   }
 }
+

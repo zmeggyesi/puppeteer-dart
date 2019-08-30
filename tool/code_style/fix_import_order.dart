@@ -35,10 +35,11 @@ final DartFormatter _dartFormatter = DartFormatter(fixes: StyleFix.all);
 final String newLineChar = Platform.isWindows ? '\r\n' : '\n';
 
 String reorderImports(String source) {
-  return _reorderImports(source, parseString(content: source).unit);
+  return  source;//_dartFormatter.format(source);
+  //return _reorderImports(source, null /*, parseString(content: source).unit*/);
 }
 
-String _reorderImports(String content, CompilationUnit unit) {
+String _reorderImports(String content, CompilationUnit unit) {/*
   var wholeDirectives = <_WholeDirective>[];
   var imports = <ImportDirective>[];
   var exports = <ExportDirective>[];
@@ -126,10 +127,10 @@ String _reorderImports(String content, CompilationUnit unit) {
   var contentAfter = content.substring(maxOffset);
 
   var newContent = contentBefore + reorderedContent + contentAfter;
+*/
+  return  _dartFormatter.format(content);
 
-  newContent = _dartFormatter.format(newContent);
-
-  return newContent;
+  //return newContent;
 }
 
 String _removeBlankLines(String content) {

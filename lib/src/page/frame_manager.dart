@@ -513,7 +513,7 @@ class Frame {
   /// - [pageFunction] Function to be evaluated in the page context
   /// - [args] Arguments to pass to `pageFunction`
   /// - Returns: Future which resolves to the return value of `pageFunction`
-  Future<T> evaluate<T>(@Language('js') String pageFunction, {List args}) {
+  Future<T> evaluate<T>(@Language('js') String pageFunction, {List? args}) {
     return _mainWorld.evaluate<T>(pageFunction, args: args);
   }
 
@@ -570,7 +570,7 @@ class Frame {
   /// var divsCounts = await frame.$$eval('div', 'divs => divs.length');
   /// ```
   Future<T> $$eval<T>(String selector, @Language('js') String pageFunction,
-      {List args}) {
+      {List? args}) {
     return _mainWorld.$$eval<T>(selector, pageFunction, args: args);
   }
 

@@ -15,16 +15,16 @@ class Target {
 
   final TargetID targetID;
   final Future<Session> Function() _sessionFactory;
-  TargetInfo _info;
+  late TargetInfo _info;
   final _initializeCompleter = Completer<bool>();
-  Future<Page> _pageFuture;
-  Future<Worker> _workerFuture;
-  Future<bool> _initialized;
+  Future<Page>? _pageFuture;
+  Future<Worker>? _workerFuture;
+  late Future<bool> _initialized;
   final _closedCompleter = Completer();
   bool _isInitialized = false;
 
   Target(this.browser, TargetInfo info, this._sessionFactory,
-      {@required this.browserContext})
+      {required this.browserContext})
       : targetID = info.targetId {
     _initialized = _initializeCompleter.future.then((success) async {
       if (!success) return false;
@@ -73,7 +73,7 @@ class Target {
   }
 
   /// If the target is not of type `"page"` or `"background_page"`, returns `null`.
-  Future<Page> get page {
+  Future<Page>? get page {
     if ((_info.type == 'page' || _info.type == 'background_page') &&
         _pageFuture == null) {
       _pageFuture = _sessionFactory().then((session) =>
@@ -82,7 +82,7 @@ class Target {
     return _pageFuture;
   }
 
-  Future<Worker> get worker async {
+  Future<Worker?> get worker async {
     if (_info.type != 'service_worker' && _info.type != 'shared_worker') {
       return null;
     }

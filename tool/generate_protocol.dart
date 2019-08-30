@@ -177,8 +177,8 @@ String _camelizeName(String input) {
 class _Command {
   final _DomainContext context;
   final Command command;
-  String _code;
-  _InternalType _returnType;
+  late String _code;
+  _InternalType? _returnType;
 
   _Command(this.context, this.command) {
     var name = command.name;
@@ -206,7 +206,7 @@ class _Command {
       code.writeln('@deprecated');
     }
 
-    String returnTypeName;
+    String? returnTypeName;
     if (returns.isNotEmpty) {
       if (returns.length == 1) {
         var firstReturn = returns.first;
@@ -233,7 +233,10 @@ class _Command {
         enumAttribute = '@Enum(${enumList(parameter.enumValues)})';
       }
 
-      return '$enumAttribute ${parameter.deprecatedAttribute} ${context.getPropertyType(parameter)} ${parameter.normalizedName}';
+      if (parameter.optional) {
+        print('parameter optional ${parameter.normalizedName}${parameter.optional ? '?' : ''}');
+      }
+      return '$enumAttribute ${parameter.deprecatedAttribute} ${context.getPropertyType(parameter)}${parameter.optional ? '?' : ''} ${parameter.normalizedName}';
     }
 
     var requiredParametersCode = <String>[];
@@ -319,13 +322,13 @@ class _Command {
 
   String get code => _code;
 
-  String get returnTypeCode => _returnType?.code;
+  String? get returnTypeCode => _returnType?.code;
 }
 
 class _Event {
   final _DomainContext context;
   final Event event;
-  String _code;
+  late String _code;
   _InternalType _complexType;
   String _typeName;
 
@@ -477,7 +480,7 @@ class _InternalType {
       code.writeln(toComment(property.description, indent: 2));
 
       String typeName = _propertyTypeName(property);
-      code.writeln('final $typeName ${property.normalizedName};');
+      code.writeln('final $typeName${property.optional ? '?' : ''} ${property.normalizedName};');
       code.writeln('');
     }
 
@@ -490,7 +493,7 @@ class _InternalType {
       for (Parameter property in properties.where((p) => !p.deprecated)) {
         bool isOptional = property.optional;
         parametersCode.add(
-            '${isOptional ? '' : '@required '}this.${property.normalizedName}');
+            '${isOptional ? '' : 'required '}this.${property.normalizedName}');
         if (!isOptional) {
           context.useMetaPackage();
         }

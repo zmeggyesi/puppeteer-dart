@@ -38,18 +38,18 @@ class Browser {
   final Future Function() _closeCallback;
   final _contexts = <BrowserContextID, BrowserContext>{};
   final _targets = <TargetID, Target>{};
-  BrowserContext _defaultContext;
+  late BrowserContext _defaultContext;
   final _onTargetCreatedController = StreamController<Target>.broadcast(),
       _onTargetDestroyedController = StreamController<Target>.broadcast(),
       _onTargetChangedController = StreamController<Target>.broadcast();
   final _plugins = <Plugin>[];
 
   Browser._(this.process, this.connection,
-      {@required this.defaultViewport,
-      @required List<BrowserContextID> browserContextIds,
-      @required bool ignoreHttpsErrors,
-      @required Future Function() closeCallback,
-      @required List<Plugin> plugins})
+      {required this.defaultViewport,
+      required List<BrowserContextID>? browserContextIds,
+      required bool ignoreHttpsErrors,
+      required Future Function() closeCallback,
+      required List<Plugin> plugins})
       : _closeCallback = closeCallback,
         ignoreHttpsErrors = ignoreHttpsErrors ?? false,
         browser = BrowserApi(connection),
@@ -175,7 +175,7 @@ class Browser {
     return _defaultContext.newPage();
   }
 
-  Future<Page> _createPageInContext(BrowserContextID contextId) async {
+  Future<Page> _createPageInContext(BrowserContextID? contextId) async {
     var targetId = await targetApi.createTarget('about:blank',
         browserContextId: contextId);
     var target = _targets[targetId];
@@ -191,7 +191,7 @@ class Browser {
       _targets.values.where((target) => target.isInitialized).toList();
 
   /// A target associated with the browser.
-  Target get target => _targets.values
+  Target? get target => _targets.values
       .firstWhere((t) => t.type == 'browser', orElse: () => null);
 
   /// Future which resolves to a list of all open pages. Non visible pages,
@@ -217,8 +217,7 @@ class Browser {
   /// await newWindowTarget;
   /// ```
   Future<Target> waitForTarget(bool Function(Target) predicate,
-      {Duration timeout}) {
-    timeout ??= const Duration(seconds: 30);
+      {Duration timeout = const Duration(seconds: 30)}) {
     return StreamGroup.merge([onTargetCreated, onTargetChanged])
         .where(predicate)
         .first
@@ -266,15 +265,15 @@ class Browser {
     return !connection.isClosed;
   }
 
-  Target targetById(TargetID targetId) => _targets[targetId];
+  Target targetById(TargetID? targetId) => _targets[targetId];
 }
 
 Browser createBrowser(Process process, Connection connection,
-        {@required DeviceViewport defaultViewport,
-        List<BrowserContextID> browserContextIds,
-        @required Future Function() closeCallback,
-        @required bool ignoreHttpsErrors,
-        @required List<Plugin> plugins}) =>
+        {required DeviceViewport defaultViewport,
+        List<BrowserContextID>? browserContextIds,
+        required Future Function() closeCallback,
+        required bool ignoreHttpsErrors,
+        required List<Plugin> plugins}) =>
     Browser._(process, connection,
         defaultViewport: defaultViewport,
         browserContextIds: browserContextIds,
@@ -301,7 +300,7 @@ class BrowserContext {
   /// The browser this browser context belongs to.
   final Browser browser;
 
-  final BrowserContextID id;
+  final BrowserContextID? id;
 
   BrowserContext(this.connection, this.browser, this.id);
 
@@ -374,7 +373,7 @@ class BrowserContext {
   }
 
   /// This searches for a target in this specific browser context.
-  Future<Target> waitForTarget(bool Function(Target) predicate, {Duration timeout}) {
+  Future<Target> waitForTarget(bool Function(Target) predicate, {Duration? timeout}) {
     return browser.waitForTarget(
         (target) => target.browserContext == this && predicate(target),
         timeout: timeout);
@@ -386,6 +385,6 @@ class BrowserContext {
   ///NOTE only incognito browser contexts can be closed.
   Future<void> close() async {
     assert(id != null, 'Non-incognito profiles cannot be closed!');
-    await browser._disposeContext(id);
+    await browser._disposeContext(id!);
   }
 }

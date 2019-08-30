@@ -789,7 +789,7 @@ class Devices with IterableMixin<Device> {
           hasTouch: false,
           isLandscape: true));
 
-  Map<String, Device> _all;
+  late Map<String, Device> _all;
   Devices._() {
     _all = CanonicalizedMap<String, String, Device>.from({
       'iPhone 4': iPhone4,

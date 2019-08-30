@@ -7,7 +7,7 @@ class Device {
   final String _userAgentTemplate;
   final DeviceViewport viewport;
 
-  const Device(this.name, {@required this.viewport, @required String userAgent})
+  const Device(this.name, {required this.viewport, required String userAgent})
       : _userAgentTemplate = userAgent,
         assert(name != null),
         assert(viewport != null),
@@ -46,12 +46,12 @@ class DeviceViewport {
         assert(height != null);
 
   DeviceViewport copyWith(
-      {int width,
-      int height,
-      num deviceScaleFactor,
-      bool isMobile,
-      bool isLandscape,
-      bool hasTouch}) {
+      {int? width,
+      int? height,
+      num? deviceScaleFactor,
+      bool? isMobile,
+      bool? isLandscape,
+      bool? hasTouch}) {
     return DeviceViewport(
       width: width ?? this.width,
       height: height ?? this.height,

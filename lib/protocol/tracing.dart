@@ -3,54 +3,63 @@ import 'package:meta/meta.dart' show required;
 import '../src/connection.dart';
 import 'io.dart' as io;
 
+
 class TracingApi {
-  final Client _client;
+final Client _client;
 
-  TracingApi(this._client);
+TracingApi(this._client);
 
-  Stream<BufferUsageEvent> get onBufferUsage => _client.onEvent
-      .where((event) => event.name == 'Tracing.bufferUsage')
-      .map((event) => BufferUsageEvent.fromJson(event.parameters));
+
+Stream<BufferUsageEvent> get onBufferUsage => _client.onEvent.where((event) => event.name == 'Tracing.bufferUsage')
+.map((event) => BufferUsageEvent.fromJson(event.parameters))
+;
+
 
   /// Contains an bucket of collected trace events. When tracing is stopped collected events will be
   /// send as a sequence of dataCollected events followed by tracingComplete event.
-  Stream<List<Map<String, dynamic>>> get onDataCollected => _client.onEvent
-      .where((event) => event.name == 'Tracing.dataCollected')
-      .map((event) => (event.parameters['value'] as List)
-          .map((e) => e as Map<String, dynamic>)
-          .toList());
+Stream<List<Map<String, dynamic>>> get onDataCollected => _client.onEvent.where((event) => event.name == 'Tracing.dataCollected')
+.map((event) => (event.parameters['value'] as List).map((e) => e as Map<String, dynamic>).toList())
+;
+
 
   /// Signals that tracing is stopped and there is no trace buffers pending flush, all data were
   /// delivered via dataCollected events.
-  Stream<TracingCompleteEvent> get onTracingComplete => _client.onEvent
-      .where((event) => event.name == 'Tracing.tracingComplete')
-      .map((event) => TracingCompleteEvent.fromJson(event.parameters));
+Stream<TracingCompleteEvent> get onTracingComplete => _client.onEvent.where((event) => event.name == 'Tracing.tracingComplete')
+.map((event) => TracingCompleteEvent.fromJson(event.parameters))
+;
+
 
   /// Stop trace events collection.
-  Future<void> end() async {
-    await _client.send('Tracing.end');
-  }
+Future<void> end(
+
+) async {
+ await _client.send('Tracing.end');
+}
 
   /// Gets supported tracing categories.
   /// Returns: A list of supported tracing categories.
-  Future<List<String>> getCategories() async {
-    var result = await _client.send('Tracing.getCategories');
-    return (result['categories'] as List).map((e) => e as String).toList();
-  }
+Future<List<String>> getCategories(
+
+) async {
+var result =  await _client.send('Tracing.getCategories');
+return (result['categories'] as List).map((e) => e as String).toList();
+}
 
   /// Record a clock sync marker in the trace.
   /// [syncId] The ID of this clock sync marker
-  Future<void> recordClockSyncMarker(String syncId) async {
-    await _client.send('Tracing.recordClockSyncMarker', {
-      'syncId': syncId,
-    });
-  }
+Future<void> recordClockSyncMarker(
+  String syncId
+) async {
+ await _client.send('Tracing.recordClockSyncMarker', {'syncId' : syncId,});
+}
 
   /// Request a global memory dump.
-  Future<RequestMemoryDumpResult> requestMemoryDump() async {
-    var result = await _client.send('Tracing.requestMemoryDump');
-    return RequestMemoryDumpResult.fromJson(result);
-  }
+Future<RequestMemoryDumpResult> requestMemoryDump(
+
+) async {
+var result =  await _client.send('Tracing.requestMemoryDump');
+return RequestMemoryDumpResult.fromJson(result);
+}
 
   /// Start trace events collection.
   /// [bufferUsageReportingInterval] If set, the agent will issue bufferUsage events at this interval, specified in milliseconds
@@ -60,303 +69,250 @@ class TracingApi {
   /// transfer mode (defaults to `json`).
   /// [streamCompression] Compression format to use. This only applies when using `ReturnAsStream`
   /// transfer mode (defaults to `none`)
-  Future<void> start(
-      {@deprecated String categories,
-      @deprecated String options,
-      num bufferUsageReportingInterval,
-      @Enum(['ReportEvents', 'ReturnAsStream']) String transferMode,
-      StreamFormat streamFormat,
-      StreamCompression streamCompression,
-      TraceConfig traceConfig}) async {
-    assert(transferMode == null ||
-        const ['ReportEvents', 'ReturnAsStream'].contains(transferMode));
-    await _client.send('Tracing.start', {
-      if (categories != null) 'categories': categories,
-      if (options != null) 'options': options,
-      if (bufferUsageReportingInterval != null)
-        'bufferUsageReportingInterval': bufferUsageReportingInterval,
-      if (transferMode != null) 'transferMode': transferMode,
-      if (streamFormat != null) 'streamFormat': streamFormat,
-      if (streamCompression != null) 'streamCompression': streamCompression,
-      if (traceConfig != null) 'traceConfig': traceConfig,
-    });
-  }
+Future<void> start(
+
+{ @deprecated String? categories, @deprecated String? options,  num? bufferUsageReportingInterval,@Enum(['ReportEvents', 'ReturnAsStream'])  String? transferMode,  StreamFormat? streamFormat,  StreamCompression? streamCompression,  TraceConfig? traceConfig}
+) async {
+assert(transferMode == null ||  const ['ReportEvents', 'ReturnAsStream'].contains(transferMode));
+ await _client.send('Tracing.start', {if (categories != null)'categories' : categories,if (options != null)'options' : options,if (bufferUsageReportingInterval != null)'bufferUsageReportingInterval' : bufferUsageReportingInterval,if (transferMode != null)'transferMode' : transferMode,if (streamFormat != null)'streamFormat' : streamFormat,if (streamCompression != null)'streamCompression' : streamCompression,if (traceConfig != null)'traceConfig' : traceConfig,});
+}
+
 }
 
 class BufferUsageEvent {
   /// A number in range [0..1] that indicates the used size of event buffer as a fraction of its
   /// total size.
-  final num percentFull;
+final num? percentFull;
 
   /// An approximate number of events in the trace log.
-  final num eventCount;
+final num? eventCount;
 
   /// A number in range [0..1] that indicates the used size of event buffer as a fraction of its
   /// total size.
-  final num value;
+final num? value;
 
-  BufferUsageEvent({this.percentFull, this.eventCount, this.value});
+BufferUsageEvent({this.percentFull,this.eventCount,this.value});
 
-  factory BufferUsageEvent.fromJson(Map<String, dynamic> json) {
-    return BufferUsageEvent(
-      percentFull:
-          json.containsKey('percentFull') ? json['percentFull'] as num : null,
-      eventCount:
-          json.containsKey('eventCount') ? json['eventCount'] as num : null,
-      value: json.containsKey('value') ? json['value'] as num : null,
-    );
-  }
+factory BufferUsageEvent.fromJson(Map<String, dynamic> json) {
+return BufferUsageEvent(
+percentFull:  json.containsKey('percentFull') ? json['percentFull'] as num : null,
+eventCount:  json.containsKey('eventCount') ? json['eventCount'] as num : null,
+value:  json.containsKey('value') ? json['value'] as num : null,
+);
 }
+}
+
 
 class TracingCompleteEvent {
   /// Indicates whether some trace data is known to have been lost, e.g. because the trace ring
   /// buffer wrapped around.
-  final bool dataLossOccurred;
+final bool dataLossOccurred;
 
   /// A handle of the stream that holds resulting trace data.
-  final io.StreamHandle stream;
+final io.StreamHandle? stream;
 
   /// Trace data format of returned stream.
-  final StreamFormat traceFormat;
+final StreamFormat? traceFormat;
 
   /// Compression format of returned stream.
-  final StreamCompression streamCompression;
+final StreamCompression? streamCompression;
 
-  TracingCompleteEvent(
-      {@required this.dataLossOccurred,
-      this.stream,
-      this.traceFormat,
-      this.streamCompression});
+TracingCompleteEvent({required this.dataLossOccurred,this.stream,this.traceFormat,this.streamCompression});
 
-  factory TracingCompleteEvent.fromJson(Map<String, dynamic> json) {
-    return TracingCompleteEvent(
-      dataLossOccurred: json['dataLossOccurred'] as bool,
-      stream: json.containsKey('stream')
-          ? io.StreamHandle.fromJson(json['stream'] as String)
-          : null,
-      traceFormat: json.containsKey('traceFormat')
-          ? StreamFormat.fromJson(json['traceFormat'] as String)
-          : null,
-      streamCompression: json.containsKey('streamCompression')
-          ? StreamCompression.fromJson(json['streamCompression'] as String)
-          : null,
-    );
-  }
+factory TracingCompleteEvent.fromJson(Map<String, dynamic> json) {
+return TracingCompleteEvent(
+dataLossOccurred:  json['dataLossOccurred'] as bool,
+stream:  json.containsKey('stream') ? io.StreamHandle.fromJson(json['stream'] as String) : null,
+traceFormat:  json.containsKey('traceFormat') ? StreamFormat.fromJson(json['traceFormat'] as String) : null,
+streamCompression:  json.containsKey('streamCompression') ? StreamCompression.fromJson(json['streamCompression'] as String) : null,
+);
 }
+}
+
 
 class RequestMemoryDumpResult {
   /// GUID of the resulting global memory dump.
-  final String dumpGuid;
+final String dumpGuid;
 
   /// True iff the global memory dump succeeded.
-  final bool success;
+final bool success;
 
-  RequestMemoryDumpResult({@required this.dumpGuid, @required this.success});
+RequestMemoryDumpResult({required this.dumpGuid,required this.success});
 
-  factory RequestMemoryDumpResult.fromJson(Map<String, dynamic> json) {
-    return RequestMemoryDumpResult(
-      dumpGuid: json['dumpGuid'] as String,
-      success: json['success'] as bool,
-    );
-  }
+factory RequestMemoryDumpResult.fromJson(Map<String, dynamic> json) {
+return RequestMemoryDumpResult(
+dumpGuid:  json['dumpGuid'] as String,
+success:  json['success'] as bool,
+);
+}
 }
 
 /// Configuration for memory dump. Used only when "memory-infra" category is enabled.
 class MemoryDumpConfig {
-  final Map<String, dynamic> value;
 
-  MemoryDumpConfig(this.value);
+final Map<String, dynamic> value;
 
-  factory MemoryDumpConfig.fromJson(Map<String, dynamic> value) =>
-      MemoryDumpConfig(value);
+MemoryDumpConfig(this.value);
 
-  Map<String, dynamic> toJson() => value;
+factory MemoryDumpConfig.fromJson(Map<String, dynamic> value) => MemoryDumpConfig(value);
 
-  @override
-  bool operator ==(other) =>
-      (other is MemoryDumpConfig && other.value == value) || value == other;
+Map<String, dynamic> toJson() => value;
 
-  @override
-  int get hashCode => value.hashCode;
+@override
+bool operator ==(other) => (other is MemoryDumpConfig && other.value == value) || value == other;
 
-  @override
-  String toString() => value.toString();
+@override
+int get hashCode => value.hashCode;
+
+@override
+String toString() => value.toString();
 }
+
 
 class TraceConfig {
   /// Controls how the trace buffer stores data.
-  final TraceConfigRecordMode recordMode;
+final TraceConfigRecordMode? recordMode;
 
   /// Turns on JavaScript stack sampling.
-  final bool enableSampling;
+final bool? enableSampling;
 
   /// Turns on system tracing.
-  final bool enableSystrace;
+final bool? enableSystrace;
 
   /// Turns on argument filter.
-  final bool enableArgumentFilter;
+final bool? enableArgumentFilter;
 
   /// Included category filters.
-  final List<String> includedCategories;
+final List<String>? includedCategories;
 
   /// Excluded category filters.
-  final List<String> excludedCategories;
+final List<String>? excludedCategories;
 
   /// Configuration to synthesize the delays in tracing.
-  final List<String> syntheticDelays;
+final List<String>? syntheticDelays;
 
   /// Configuration for memory dump triggers. Used only when "memory-infra" category is enabled.
-  final MemoryDumpConfig memoryDumpConfig;
+final MemoryDumpConfig? memoryDumpConfig;
 
-  TraceConfig(
-      {this.recordMode,
-      this.enableSampling,
-      this.enableSystrace,
-      this.enableArgumentFilter,
-      this.includedCategories,
-      this.excludedCategories,
-      this.syntheticDelays,
-      this.memoryDumpConfig});
+TraceConfig({this.recordMode,this.enableSampling,this.enableSystrace,this.enableArgumentFilter,this.includedCategories,this.excludedCategories,this.syntheticDelays,this.memoryDumpConfig});
 
-  factory TraceConfig.fromJson(Map<String, dynamic> json) {
-    return TraceConfig(
-      recordMode: json.containsKey('recordMode')
-          ? TraceConfigRecordMode.fromJson(json['recordMode'] as String)
-          : null,
-      enableSampling: json.containsKey('enableSampling')
-          ? json['enableSampling'] as bool
-          : null,
-      enableSystrace: json.containsKey('enableSystrace')
-          ? json['enableSystrace'] as bool
-          : null,
-      enableArgumentFilter: json.containsKey('enableArgumentFilter')
-          ? json['enableArgumentFilter'] as bool
-          : null,
-      includedCategories: json.containsKey('includedCategories')
-          ? (json['includedCategories'] as List)
-              .map((e) => e as String)
-              .toList()
-          : null,
-      excludedCategories: json.containsKey('excludedCategories')
-          ? (json['excludedCategories'] as List)
-              .map((e) => e as String)
-              .toList()
-          : null,
-      syntheticDelays: json.containsKey('syntheticDelays')
-          ? (json['syntheticDelays'] as List).map((e) => e as String).toList()
-          : null,
-      memoryDumpConfig: json.containsKey('memoryDumpConfig')
-          ? MemoryDumpConfig.fromJson(
-              json['memoryDumpConfig'] as Map<String, dynamic>)
-          : null,
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      if (recordMode != null) 'recordMode': recordMode,
-      if (enableSampling != null) 'enableSampling': enableSampling,
-      if (enableSystrace != null) 'enableSystrace': enableSystrace,
-      if (enableArgumentFilter != null)
-        'enableArgumentFilter': enableArgumentFilter,
-      if (includedCategories != null)
-        'includedCategories': [...includedCategories],
-      if (excludedCategories != null)
-        'excludedCategories': [...excludedCategories],
-      if (syntheticDelays != null) 'syntheticDelays': [...syntheticDelays],
-      if (memoryDumpConfig != null)
-        'memoryDumpConfig': memoryDumpConfig.toJson(),
-    };
-  }
+factory TraceConfig.fromJson(Map<String, dynamic> json) {
+return TraceConfig(
+recordMode:  json.containsKey('recordMode') ? TraceConfigRecordMode.fromJson(json['recordMode'] as String) : null,
+enableSampling:  json.containsKey('enableSampling') ? json['enableSampling'] as bool : null,
+enableSystrace:  json.containsKey('enableSystrace') ? json['enableSystrace'] as bool : null,
+enableArgumentFilter:  json.containsKey('enableArgumentFilter') ? json['enableArgumentFilter'] as bool : null,
+includedCategories:  json.containsKey('includedCategories') ? (json['includedCategories'] as List).map((e) => e as String).toList() : null,
+excludedCategories:  json.containsKey('excludedCategories') ? (json['excludedCategories'] as List).map((e) => e as String).toList() : null,
+syntheticDelays:  json.containsKey('syntheticDelays') ? (json['syntheticDelays'] as List).map((e) => e as String).toList() : null,
+memoryDumpConfig:  json.containsKey('memoryDumpConfig') ? MemoryDumpConfig.fromJson(json['memoryDumpConfig'] as Map<String, dynamic>) : null,
+);
 }
 
+Map<String, dynamic> toJson() {
+return {
+if (recordMode != null) 
+'recordMode' : recordMode,
+if (enableSampling != null) 
+'enableSampling' : enableSampling,
+if (enableSystrace != null) 
+'enableSystrace' : enableSystrace,
+if (enableArgumentFilter != null) 
+'enableArgumentFilter' : enableArgumentFilter,
+if (includedCategories != null) 
+'includedCategories' : [...includedCategories],
+if (excludedCategories != null) 
+'excludedCategories' : [...excludedCategories],
+if (syntheticDelays != null) 
+'syntheticDelays' : [...syntheticDelays],
+if (memoryDumpConfig != null) 
+'memoryDumpConfig' : memoryDumpConfig.toJson(),
+};}
+}
+
+
 class TraceConfigRecordMode {
-  static const recordUntilFull = TraceConfigRecordMode._('recordUntilFull');
-  static const recordContinuously =
-      TraceConfigRecordMode._('recordContinuously');
-  static const recordAsMuchAsPossible =
-      TraceConfigRecordMode._('recordAsMuchAsPossible');
-  static const echoToConsole = TraceConfigRecordMode._('echoToConsole');
-  static const values = {
-    'recordUntilFull': recordUntilFull,
-    'recordContinuously': recordContinuously,
-    'recordAsMuchAsPossible': recordAsMuchAsPossible,
-    'echoToConsole': echoToConsole,
-  };
+static const recordUntilFull = TraceConfigRecordMode._('recordUntilFull');
+static const recordContinuously = TraceConfigRecordMode._('recordContinuously');
+static const recordAsMuchAsPossible = TraceConfigRecordMode._('recordAsMuchAsPossible');
+static const echoToConsole = TraceConfigRecordMode._('echoToConsole');
+static const values = {
+'recordUntilFull': recordUntilFull,
+'recordContinuously': recordContinuously,
+'recordAsMuchAsPossible': recordAsMuchAsPossible,
+'echoToConsole': echoToConsole,
+};
 
-  final String value;
+final String value;
 
-  const TraceConfigRecordMode._(this.value);
+const TraceConfigRecordMode._(this.value);
 
-  factory TraceConfigRecordMode.fromJson(String value) => values[value];
+factory TraceConfigRecordMode.fromJson(String value) => values[value];
 
-  String toJson() => value;
+String toJson() => value;
 
-  @override
-  bool operator ==(other) =>
-      (other is TraceConfigRecordMode && other.value == value) ||
-      value == other;
+@override
+bool operator ==(other) => (other is TraceConfigRecordMode && other.value == value) || value == other;
 
-  @override
-  int get hashCode => value.hashCode;
+@override
+int get hashCode => value.hashCode;
 
-  @override
-  String toString() => value.toString();
+@override
+String toString() => value.toString();
 }
 
 /// Data format of a trace. Can be either the legacy JSON format or the
 /// protocol buffer format. Note that the JSON format will be deprecated soon.
 class StreamFormat {
-  static const json = StreamFormat._('json');
-  static const proto = StreamFormat._('proto');
-  static const values = {
-    'json': json,
-    'proto': proto,
-  };
+static const json = StreamFormat._('json');
+static const proto = StreamFormat._('proto');
+static const values = {
+'json': json,
+'proto': proto,
+};
 
-  final String value;
+final String value;
 
-  const StreamFormat._(this.value);
+const StreamFormat._(this.value);
 
-  factory StreamFormat.fromJson(String value) => values[value];
+factory StreamFormat.fromJson(String value) => values[value];
 
-  String toJson() => value;
+String toJson() => value;
 
-  @override
-  bool operator ==(other) =>
-      (other is StreamFormat && other.value == value) || value == other;
+@override
+bool operator ==(other) => (other is StreamFormat && other.value == value) || value == other;
 
-  @override
-  int get hashCode => value.hashCode;
+@override
+int get hashCode => value.hashCode;
 
-  @override
-  String toString() => value.toString();
+@override
+String toString() => value.toString();
 }
 
 /// Compression type to use for traces returned via streams.
 class StreamCompression {
-  static const none = StreamCompression._('none');
-  static const gzip = StreamCompression._('gzip');
-  static const values = {
-    'none': none,
-    'gzip': gzip,
-  };
+static const none = StreamCompression._('none');
+static const gzip = StreamCompression._('gzip');
+static const values = {
+'none': none,
+'gzip': gzip,
+};
 
-  final String value;
+final String value;
 
-  const StreamCompression._(this.value);
+const StreamCompression._(this.value);
 
-  factory StreamCompression.fromJson(String value) => values[value];
+factory StreamCompression.fromJson(String value) => values[value];
 
-  String toJson() => value;
+String toJson() => value;
 
-  @override
-  bool operator ==(other) =>
-      (other is StreamCompression && other.value == value) || value == other;
+@override
+bool operator ==(other) => (other is StreamCompression && other.value == value) || value == other;
 
-  @override
-  int get hashCode => value.hashCode;
+@override
+int get hashCode => value.hashCode;
 
-  @override
-  String toString() => value.toString();
+@override
+String toString() => value.toString();
 }
+

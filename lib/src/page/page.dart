@@ -1305,7 +1305,7 @@ function deliverError(name, seq, message, stack) {
   /// - [pageFunction] Function to be evaluated in the page context
   /// - [args] Arguments to pass to `pageFunction`
   /// - Returns: Future which resolves to the return value of `pageFunction`
-  Future<T> evaluate<T>(@Language('js') String pageFunction, {List args}) {
+  Future<T> evaluate<T>(@Language('js') String pageFunction, {List? args}) {
     return _frameManager.mainFrame.evaluate<T>(pageFunction, args: args);
   }
 
@@ -1955,17 +1955,17 @@ class PaperFormat {
 
   final num width, height;
 
-  const PaperFormat.inches({@required this.width, @required this.height});
+  const PaperFormat.inches({required this.width, required this.height});
 
-  PaperFormat.px({@required int width, @required int height})
+  PaperFormat.px({required int width, required int height})
       : width = _pxToInches(width),
         height = _pxToInches(height);
 
-  PaperFormat.cm({@required num width, @required num height})
+  PaperFormat.cm({required num width, required num height})
       : width = _cmToInches(width),
         height = _cmToInches(height);
 
-  PaperFormat.mm({@required num width, @required num height})
+  PaperFormat.mm({required num width, required num height})
       : width = _mmToInches(width),
         height = _mmToInches(height);
 

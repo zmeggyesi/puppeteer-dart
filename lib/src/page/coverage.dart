@@ -15,7 +15,7 @@ class CoverageEntry {
   final List<Range> ranges;
 
   CoverageEntry(
-      {@required this.url, @required this.text, @required this.ranges})
+      {required this.url, required this.text, required this.ranges})
       : assert(url != null),
         assert(text != null),
         assert(ranges != null);
@@ -100,7 +100,7 @@ class Coverage {
   /// `new Function`. If `reportAnonymousScripts` is set to `true`, anonymous
   /// scripts will have `__puppeteer_evaluation_script__` as their URL.
   Future<void> startJSCoverage(
-      {bool resetOnNavigation, bool reportAnonymousScripts}) {
+      {bool? resetOnNavigation, bool? reportAnonymousScripts}) {
     return _jsCoverage.start(
         resetOnNavigation: resetOnNavigation,
         reportAnonymousScripts: reportAnonymousScripts);
@@ -155,7 +155,7 @@ class JsCoverage {
   JsCoverage(this._devTools);
 
   Future<void> start(
-      {bool resetOnNavigation, bool reportAnonymousScripts}) async {
+      {bool resetOnNavigation = true, bool reportAnonymousScripts = false}) async {
     assert(!_enabled, 'JSCoverage is already enabled');
 
     resetOnNavigation ??= true;
@@ -327,7 +327,7 @@ class _Point {
   final int offset, type;
   final CoverageRange range;
 
-  _Point({@required this.offset, @required this.type, @required this.range});
+  _Point({required this.offset, required this.type, required this.range});
 }
 
 List<Range> _convertToDisjointRanges(List<CoverageRange> nestedRanges) {

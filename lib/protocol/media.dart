@@ -4,204 +4,211 @@ import '../src/connection.dart';
 
 /// This domain allows detailed inspection of media elements
 class MediaApi {
-  final Client _client;
+final Client _client;
 
-  MediaApi(this._client);
+MediaApi(this._client);
 
   /// This can be called multiple times, and can be used to set / override /
   /// remove player properties. A null propValue indicates removal.
-  Stream<PlayerPropertiesChangedEvent> get onPlayerPropertiesChanged => _client
-      .onEvent
-      .where((event) => event.name == 'Media.playerPropertiesChanged')
-      .map((event) => PlayerPropertiesChangedEvent.fromJson(event.parameters));
+Stream<PlayerPropertiesChangedEvent> get onPlayerPropertiesChanged => _client.onEvent.where((event) => event.name == 'Media.playerPropertiesChanged')
+.map((event) => PlayerPropertiesChangedEvent.fromJson(event.parameters))
+;
+
 
   /// Send events as a list, allowing them to be batched on the browser for less
   /// congestion. If batched, events must ALWAYS be in chronological order.
-  Stream<PlayerEventsAddedEvent> get onPlayerEventsAdded => _client.onEvent
-      .where((event) => event.name == 'Media.playerEventsAdded')
-      .map((event) => PlayerEventsAddedEvent.fromJson(event.parameters));
+Stream<PlayerEventsAddedEvent> get onPlayerEventsAdded => _client.onEvent.where((event) => event.name == 'Media.playerEventsAdded')
+.map((event) => PlayerEventsAddedEvent.fromJson(event.parameters))
+;
+
 
   /// Called whenever a player is created, or when a new agent joins and recieves
   /// a list of active players. If an agent is restored, it will recieve the full
   /// list of player ids and all events again.
-  Stream<List<PlayerId>> get onPlayersCreated => _client.onEvent
-      .where((event) => event.name == 'Media.playersCreated')
-      .map((event) => (event.parameters['players'] as List)
-          .map((e) => PlayerId.fromJson(e as String))
-          .toList());
+Stream<List<PlayerId>> get onPlayersCreated => _client.onEvent.where((event) => event.name == 'Media.playersCreated')
+.map((event) => (event.parameters['players'] as List).map((e) => PlayerId.fromJson(e as String)).toList())
+;
+
 
   /// Enables the Media domain
-  Future<void> enable() async {
-    await _client.send('Media.enable');
-  }
+Future<void> enable(
+
+) async {
+ await _client.send('Media.enable');
+}
 
   /// Disables the Media domain.
-  Future<void> disable() async {
-    await _client.send('Media.disable');
-  }
+Future<void> disable(
+
+) async {
+ await _client.send('Media.disable');
+}
+
 }
 
 class PlayerPropertiesChangedEvent {
-  final PlayerId playerId;
 
-  final List<PlayerProperty> properties;
+final PlayerId playerId;
 
-  PlayerPropertiesChangedEvent(
-      {@required this.playerId, @required this.properties});
 
-  factory PlayerPropertiesChangedEvent.fromJson(Map<String, dynamic> json) {
-    return PlayerPropertiesChangedEvent(
-      playerId: PlayerId.fromJson(json['playerId'] as String),
-      properties: (json['properties'] as List)
-          .map((e) => PlayerProperty.fromJson(e as Map<String, dynamic>))
-          .toList(),
-    );
-  }
+final List<PlayerProperty> properties;
+
+PlayerPropertiesChangedEvent({required this.playerId,required this.properties});
+
+factory PlayerPropertiesChangedEvent.fromJson(Map<String, dynamic> json) {
+return PlayerPropertiesChangedEvent(
+playerId:  PlayerId.fromJson(json['playerId'] as String),
+properties:  (json['properties'] as List).map((e) => PlayerProperty.fromJson(e as Map<String, dynamic>)).toList(),
+);
+}
 }
 
+
 class PlayerEventsAddedEvent {
-  final PlayerId playerId;
 
-  final List<PlayerEvent> events;
+final PlayerId playerId;
 
-  PlayerEventsAddedEvent({@required this.playerId, @required this.events});
 
-  factory PlayerEventsAddedEvent.fromJson(Map<String, dynamic> json) {
-    return PlayerEventsAddedEvent(
-      playerId: PlayerId.fromJson(json['playerId'] as String),
-      events: (json['events'] as List)
-          .map((e) => PlayerEvent.fromJson(e as Map<String, dynamic>))
-          .toList(),
-    );
-  }
+final List<PlayerEvent> events;
+
+PlayerEventsAddedEvent({required this.playerId,required this.events});
+
+factory PlayerEventsAddedEvent.fromJson(Map<String, dynamic> json) {
+return PlayerEventsAddedEvent(
+playerId:  PlayerId.fromJson(json['playerId'] as String),
+events:  (json['events'] as List).map((e) => PlayerEvent.fromJson(e as Map<String, dynamic>)).toList(),
+);
+}
 }
 
 /// Players will get an ID that is unique within the agent context.
 class PlayerId {
-  final String value;
 
-  PlayerId(this.value);
+final String value;
 
-  factory PlayerId.fromJson(String value) => PlayerId(value);
+PlayerId(this.value);
 
-  String toJson() => value;
+factory PlayerId.fromJson(String value) => PlayerId(value);
 
-  @override
-  bool operator ==(other) =>
-      (other is PlayerId && other.value == value) || value == other;
+String toJson() => value;
 
-  @override
-  int get hashCode => value.hashCode;
+@override
+bool operator ==(other) => (other is PlayerId && other.value == value) || value == other;
 
-  @override
-  String toString() => value.toString();
+@override
+int get hashCode => value.hashCode;
+
+@override
+String toString() => value.toString();
 }
 
+
 class Timestamp {
-  final num value;
 
-  Timestamp(this.value);
+final num value;
 
-  factory Timestamp.fromJson(num value) => Timestamp(value);
+Timestamp(this.value);
 
-  num toJson() => value;
+factory Timestamp.fromJson(num value) => Timestamp(value);
 
-  @override
-  bool operator ==(other) =>
-      (other is Timestamp && other.value == value) || value == other;
+num toJson() => value;
 
-  @override
-  int get hashCode => value.hashCode;
+@override
+bool operator ==(other) => (other is Timestamp && other.value == value) || value == other;
 
-  @override
-  String toString() => value.toString();
+@override
+int get hashCode => value.hashCode;
+
+@override
+String toString() => value.toString();
 }
 
 /// Player Property type
 class PlayerProperty {
-  final String name;
 
-  final String value;
+final String name;
 
-  PlayerProperty({@required this.name, this.value});
 
-  factory PlayerProperty.fromJson(Map<String, dynamic> json) {
-    return PlayerProperty(
-      name: json['name'] as String,
-      value: json.containsKey('value') ? json['value'] as String : null,
-    );
-  }
+final String? value;
 
-  Map<String, dynamic> toJson() {
-    return {
-      'name': name,
-      if (value != null) 'value': value,
-    };
-  }
+PlayerProperty({required this.name,this.value});
+
+factory PlayerProperty.fromJson(Map<String, dynamic> json) {
+return PlayerProperty(
+name:  json['name'] as String,
+value:  json.containsKey('value') ? json['value'] as String : null,
+);
+}
+
+Map<String, dynamic> toJson() {
+return {
+'name': name,
+if (value != null) 
+'value' : value,
+};}
 }
 
 /// Break out events into different types
 class PlayerEventType {
-  static const playbackEvent = PlayerEventType._('playbackEvent');
-  static const systemEvent = PlayerEventType._('systemEvent');
-  static const messageEvent = PlayerEventType._('messageEvent');
-  static const values = {
-    'playbackEvent': playbackEvent,
-    'systemEvent': systemEvent,
-    'messageEvent': messageEvent,
-  };
+static const playbackEvent = PlayerEventType._('playbackEvent');
+static const systemEvent = PlayerEventType._('systemEvent');
+static const messageEvent = PlayerEventType._('messageEvent');
+static const values = {
+'playbackEvent': playbackEvent,
+'systemEvent': systemEvent,
+'messageEvent': messageEvent,
+};
 
-  final String value;
+final String value;
 
-  const PlayerEventType._(this.value);
+const PlayerEventType._(this.value);
 
-  factory PlayerEventType.fromJson(String value) => values[value];
+factory PlayerEventType.fromJson(String value) => values[value];
 
-  String toJson() => value;
+String toJson() => value;
 
-  @override
-  bool operator ==(other) =>
-      (other is PlayerEventType && other.value == value) || value == other;
+@override
+bool operator ==(other) => (other is PlayerEventType && other.value == value) || value == other;
 
-  @override
-  int get hashCode => value.hashCode;
+@override
+int get hashCode => value.hashCode;
 
-  @override
-  String toString() => value.toString();
+@override
+String toString() => value.toString();
 }
 
+
 class PlayerEvent {
-  final PlayerEventType type;
+
+final PlayerEventType type;
 
   /// Events are timestamped relative to the start of the player creation
   /// not relative to the start of playback.
-  final Timestamp timestamp;
+final Timestamp timestamp;
 
-  final String name;
 
-  final String value;
+final String name;
 
-  PlayerEvent(
-      {@required this.type,
-      @required this.timestamp,
-      @required this.name,
-      @required this.value});
 
-  factory PlayerEvent.fromJson(Map<String, dynamic> json) {
-    return PlayerEvent(
-      type: PlayerEventType.fromJson(json['type'] as String),
-      timestamp: Timestamp.fromJson(json['timestamp'] as num),
-      name: json['name'] as String,
-      value: json['value'] as String,
-    );
-  }
+final String value;
 
-  Map<String, dynamic> toJson() {
-    return {
-      'type': type.toJson(),
-      'timestamp': timestamp.toJson(),
-      'name': name,
-      'value': value,
-    };
-  }
+PlayerEvent({required this.type,required this.timestamp,required this.name,required this.value});
+
+factory PlayerEvent.fromJson(Map<String, dynamic> json) {
+return PlayerEvent(
+type:  PlayerEventType.fromJson(json['type'] as String),
+timestamp:  Timestamp.fromJson(json['timestamp'] as num),
+name:  json['name'] as String,
+value:  json['value'] as String,
+);
 }
+
+Map<String, dynamic> toJson() {
+return {
+'type': type.toJson(),
+'timestamp': timestamp.toJson(),
+'name': name,
+'value': value,
+};}
+}
+

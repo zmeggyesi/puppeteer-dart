@@ -27,11 +27,11 @@ class Worker {
   Worker(
       this.client,
       this.url,
-      {@required
-          void Function(ConsoleAPICalledEventType, List<JsHandle>, StackTraceData)
+      {required
+          void Function(ConsoleAPICalledEventType, List<JsHandle>, StackTraceData)?
               onConsoleApiCalled,
-      @required
-          void Function(ExceptionThrownEvent) onExceptionThrown}) {
+      required
+          void Function(ExceptionThrownEvent)? onExceptionThrown}) {
     var runtimeApi = RuntimeApi(client);
 
     JsHandle Function(RemoteObject) jsHandleFactory;
@@ -78,7 +78,7 @@ class Worker {
   /// - [args] Arguments to pass to `pageFunction`
   /// - Returns: Future which resolves to the return value of `pageFunction`
   Future<T> evaluate<T>(@Language('js') String pageFunction,
-      {List args}) async {
+      {List? args}) async {
     return (await executionContext).evaluate<T>(pageFunction, args: args);
   }
 

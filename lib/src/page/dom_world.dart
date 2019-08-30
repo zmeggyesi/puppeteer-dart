@@ -12,32 +12,32 @@ class DomWorld {
   final FrameManager frameManager;
   final Frame frame;
   final _waitTasks = <WaitTask>{};
-  Completer<ExecutionContext> _contextCompleter;
-  Future<ElementHandle> _documentFuture;
+  Completer<ExecutionContext?>? _contextCompleter;
+  Future<ElementHandle>? _documentFuture;
   bool _detached = false;
 
   DomWorld(this.frameManager, this.frame) {
     setContext(null);
   }
 
-  void setContext(ExecutionContext context) {
+  void setContext(ExecutionContext? context) {
     if (context != null) {
       _documentFuture = null;
-      _contextCompleter.complete(context);
+      _contextCompleter!.complete(context);
 
       for (var waitTask in _waitTasks) {
         waitTask.rerun();
       }
     } else {
-      if (_contextCompleter != null && !_contextCompleter.isCompleted) {
-        _contextCompleter.completeError('Context is disposed');
+      if (_contextCompleter != null && !_contextCompleter!.isCompleted) {
+        _contextCompleter!.completeError('Context is disposed');
       }
       _contextCompleter = Completer<ExecutionContext>();
     }
   }
 
   bool get hasContext =>
-      _contextCompleter != null && _contextCompleter.isCompleted;
+      _contextCompleter != null && _contextCompleter!.isCompleted;
 
   void detach() {
     _detached = true;
@@ -62,7 +62,7 @@ class DomWorld {
   }
 
   Future<T> evaluate<T>(@Language('js') String pageFunction,
-      {List args}) async {
+      {List? args}) async {
     var context = await executionContext;
     return context.evaluate<T>(pageFunction, args: args);
   }
@@ -91,13 +91,13 @@ class DomWorld {
   }
 
   Future<T> $eval<T>(String selector, @Language('js') String pageFunction,
-      {List args}) async {
+      {List? args}) async {
     var document = await _document;
     return document.$eval<T>(selector, pageFunction, args: args);
   }
 
   Future<T> $$eval<T>(String selector, @Language('js') String pageFunction,
-      {List args}) async {
+      {List? args}) async {
     var document = await _document;
     return document.$$eval<T>(selector, pageFunction, args: args);
   }
@@ -329,20 +329,20 @@ function _(element, values) {
   }
 
   Future<ElementHandle> waitForSelector(String selector,
-      {bool visible, bool hidden, Duration timeout}) {
+      {bool? visible, bool? hidden, Duration? timeout}) {
     return _waitForSelectorOrXPath(selector,
         isXPath: false, visible: visible, hidden: hidden, timeout: timeout);
   }
 
   Future<ElementHandle> waitForXPath(String xpath,
-      {bool visible, bool hidden, Duration timeout}) {
+      {bool? visible, bool? hidden, Duration? timeout}) {
     return _waitForSelectorOrXPath(xpath,
         isXPath: true, visible: visible, hidden: hidden, timeout: timeout);
   }
 
   Future<JsHandle> waitForFunction(
       @Language('js') String pageFunction, List args,
-      {Duration timeout, Polling polling}) async {
+      {Duration? timeout, Polling? polling}) async {
     var functionDeclaration = convertToFunctionDeclaration(pageFunction);
     if (functionDeclaration == null) {
       pageFunction = 'function _() { return $pageFunction; }';
@@ -384,11 +384,11 @@ function _(selectorOrXPath, isXPath, waitForVisible, waitForHidden) {
 }
 ''';
 
-  Future<ElementHandle> _waitForSelectorOrXPath(String selectorOrXPath,
+  Future<ElementHandle?> _waitForSelectorOrXPath(String selectorOrXPath,
       {bool isXPath = false,
-      bool visible,
-      bool hidden,
-      Duration timeout}) async {
+      bool? visible,
+      bool? hidden,
+      Duration? timeout}) async {
     bool waitForVisible = visible ?? false;
     bool waitForHidden = hidden ?? false;
 
@@ -427,24 +427,22 @@ class WaitTask {
   final List predicateArgs;
   final _completer = Completer<JsHandle>();
   int _runCount = 0;
-  Timer _timeoutTimer;
+  late Timer _timeoutTimer;
   bool _terminated = false;
 
   WaitTask(this.domWorld, @Language('js') this.predicate,
-      {@required this.title,
-      @required this.polling,
-      @required this.timeout,
-      @required this.predicateArgs})
+      {required this.title,
+      required this.polling,
+      required this.timeout,
+      required this.predicateArgs})
       : assert(polling != null) {
     domWorld._waitTasks.add(this);
 
     // Since page navigation requires us to re-install the pageScript, we should track
     // timeout on our end.
-    if (timeout != null) {
       var timeoutError = TimeoutException(
           'waiting for $title failed: timeout ${timeout.inMilliseconds}ms exceeded');
       _timeoutTimer = Timer(timeout, () => terminate(timeoutError));
-    }
     rerun();
   }
 

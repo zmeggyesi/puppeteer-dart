@@ -37,8 +37,8 @@ class JsHandle {
       ExecutionContext context, RemoteObject remoteObject) {
     var frame = context.frame;
     if (remoteObject.subtype == RemoteObjectSubtype.node && frame != null) {
-      var frameManager = context.world.frameManager;
-      return ElementHandle(context, remoteObject, context.frame, frameManager);
+      var frameManager = context.world!.frameManager;
+      return ElementHandle(context, remoteObject, frame, frameManager);
     }
     return JsHandle(context, remoteObject);
   }
@@ -112,7 +112,7 @@ function _(object, propertyName) {
 
   /// Returns either `null` or the object handle itself, if the object handle is
   /// an instance of [ElementHandle].
-  ElementHandle get asElement => null;
+  ElementHandle? get asElement => null;
 
   /// Stops referencing the element handle.
   ///
@@ -181,7 +181,7 @@ class ElementHandle extends JsHandle {
 
   /// Resolves to the content frame for element handles referencing iframe nodes,
   /// or null otherwise
-  Future<Frame> get contentFrame async {
+  Future<Frame?> get contentFrame async {
     var nodeInfo = await executionContext.domApi
         .describeNode(objectId: remoteObject.objectId);
 
@@ -358,7 +358,7 @@ async function _(element, pageJavascriptEnabled) {
   /// await elementHandle.type('some text');
   /// await elementHandle.press(Key.enter);
   /// ```
-  Future<void> type(String text, {Duration delay}) async {
+  Future<void> type(String text, {Duration? delay}) async {
     await focus();
     await page.keyboard.type(text, delay: delay);
   }
@@ -560,7 +560,7 @@ async function _(element, pageJavascriptEnabled) {
   ///
   /// Returns: [Future] which resolves to the return value of `pageFunction`
   Future<T> $$eval<T>(String selector, @Language('js') String pageFunction,
-      {List args}) async {
+      {List? args}) async {
     var arrayHandle = await executionContext.evaluateHandle(
         //language=js
         'function _(element, selector) {return Array.from(element.querySelectorAll(selector));}',

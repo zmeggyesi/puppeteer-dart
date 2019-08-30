@@ -3,8 +3,8 @@ import 'package:test/test.dart';
 import 'utils/utils.dart';
 
 main() {
-  Server server;
-  Browser browser;
+  late Server server;
+  late Browser browser;
   setUpAll(() async {
     server = await Server.create();
     browser = await puppeteer.launch();
@@ -38,7 +38,7 @@ main() {
   group('Browser.target', () {
     test('should return browser target', () async {
       var target = browser.target;
-      expect(target.type, equals('browser'));
+      expect(target!.type, equals('browser'));
     });
   });
 

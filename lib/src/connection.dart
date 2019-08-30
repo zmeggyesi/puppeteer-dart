@@ -52,7 +52,7 @@ class Connection implements Client {
   TargetApi get targetApi => _targetApi;
 
   static Future<Connection> create(String url,
-      {@required Duration delay}) async {
+      {required Duration delay}) async {
     var webSocket = await WebSocket.connect(url);
 
     return Connection._(webSocket, url, delay: delay);
@@ -70,7 +70,7 @@ class Connection implements Client {
     return message.completer.future;
   }
 
-  int _rawSend(String method, Map<String, dynamic> parameters, {SessionID sessionId}) {
+  int _rawSend(String method, Map<String, dynamic>? parameters, {SessionID sessionId}) {
     var id = ++_lastId;
     var message = _encodeMessage(id, method, parameters, sessionId: sessionId);
 
@@ -171,16 +171,14 @@ class Connection implements Client {
   Future get disconnected => _webSocket.done;
 }
 
-String _encodeMessage(int id, String method, Map<String, dynamic> parameters,
+String _encodeMessage(int id, String method, Map<String, dynamic>? parameters,
     {SessionID sessionId}) {
   var message = {
     'id': id,
     'method': method,
-    'params': parameters,
+    if (parameters != null) 'params': parameters,
+    if (sessionId != null) 'sessionId': sessionId.value,
   };
-  if (sessionId != null) {
-    message['sessionId'] = sessionId.value;
-  }
   return jsonEncode(message);
 }
 
@@ -192,10 +190,10 @@ class Session implements Client {
   final _eventController = StreamController<Event>.broadcast(sync: true);
   final _onClose = Completer<void>();
 
-  Session(this.connection, this.sessionId, {@required this.targetType});
+  Session(this.connection, this.sessionId, {required this.targetType});
 
   @override
-  Future<Map<String, dynamic>> send(String method, [Map<String, dynamic> parameters]) {
+  Future<Map<String, dynamic>> send(String method, [Map<String, dynamic>? parameters]) {
     if (_eventController.isClosed) {
       throw Exception(
           'Protocol error ($method): Session closed. Most likely the $targetType has been closed.');
@@ -234,7 +232,7 @@ class Session implements Client {
     await connection.targetApi.detachFromTarget(sessionId: sessionId);
   }
 
-  void dispose({@required String reason}) {
+  void dispose({required String reason}) {
     if (_eventController.isClosed) return;
 
     _eventController.close();
@@ -270,7 +268,7 @@ class TargetClosedException implements Exception {
   final String method;
   final String reason;
 
-  TargetClosedException(this.method, {@required this.reason});
+  TargetClosedException(this.method, {required this.reason});
 
   @override
   String toString() =>

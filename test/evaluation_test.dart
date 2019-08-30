@@ -5,9 +5,9 @@ import 'utils/utils.dart';
 // ignore_for_file: prefer_interpolation_to_compose_strings
 
 main() {
-  Server server;
-  Browser browser;
-  Page page;
+  late Server server;
+  late Browser browser;
+  late Page page;
   setUpAll(() async {
     server = await Server.create();
     browser = await puppeteer.launch(
@@ -27,7 +27,6 @@ main() {
   tearDown(() async {
     server.clearRoutes();
     await page.close();
-    page = null;
   });
 
   test('Evaluate simple value', () async {
@@ -43,7 +42,7 @@ main() {
   test('Evaluate List', () async {
     expect(
         await page.evaluate('[true, false, undefined, null, 1, 1.5, "Hello"]'),
-        equals([true, false, null, null, 1, 1.5, "Hello"]));
+        equals(<dynamic>[true, false, null, null, 1, 1.5, "Hello"]));
   });
 
   group('Page.evaluate', () {
@@ -121,7 +120,7 @@ main() {
       expect(result, equals(56));
     });
     test('should work right after framenavigated', () async {
-      Future<int> frameEvaluation;
+      late Future<int> frameEvaluation;
       page.onFrameNavigated.listen((frame) {
         frameEvaluation = frame.evaluate('() => 6 * 7');
       });

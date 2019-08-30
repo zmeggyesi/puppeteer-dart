@@ -6,7 +6,7 @@ import 'package:petitparser/petitparser.dart';
 /// function declaration.
 /// Returns the string as it if this is already a classical function declaration
 /// Returns null if we cannot parse recognize the declaration
-String convertToFunctionDeclaration(String javascript) {
+String? convertToFunctionDeclaration(String javascript) {
   var grammar = JsGrammar();
   var result = grammar.parse(javascript);
 

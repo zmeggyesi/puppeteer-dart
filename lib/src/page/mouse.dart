@@ -31,15 +31,14 @@ class Mouse {
   final InputApi inputApi;
   final Keyboard keyboard;
   Point _position = Point(0, 0);
-  MouseButton _button;
+  MouseButton? _button;
 
   Mouse(this.inputApi, this.keyboard);
 
-  static String _buttonName(MouseButton button) => button?.name ?? 'none';
+  static String _buttonName(MouseButton? button) => button?.name ?? 'none';
 
   /// Dispatches a `mousemove` event.
-  Future<void> move(Point position, {int steps}) async {
-    steps ??= 1;
+  Future<void> move(Point position, {int steps = 1}) async {
     var from = _position;
     _position = position;
     for (var i = 1; i <= steps; i++) {
@@ -75,9 +74,7 @@ class Mouse {
   }
 
   /// Dispatches a `mouseup` event.
-  Future<void> up({MouseButton button, int clickCount}) async {
-    button ??= MouseButton.left;
-    clickCount ??= 1;
+  Future<void> up({MouseButton button = MouseButton.left, int clickCount = 1}) async {
     _button = null;
     await inputApi.dispatchMouseEvent('mouseReleased', _position.x, _position.y,
         button: _buttonName(button),

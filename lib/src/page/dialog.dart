@@ -28,7 +28,7 @@ class Dialog {
   /// the dialog's `type` is not prompt.
   ///
   /// Returns [Future] which resolves when the dialog has been accepted.
-  Future<void> accept({String promptText}) async {
+  Future<void> accept({String? promptText}) async {
     assert(!_handled, 'Cannot accept dialog which is already handled!');
     _handled = true;
     await page.devTools.page
@@ -47,7 +47,7 @@ class Dialog {
 
   /// If dialog is prompt, returns default prompt value. Otherwise, returns
   /// empty string.
-  String get defaultValue => _openingEvent.defaultPrompt;
+  String get defaultValue => _openingEvent.defaultPrompt ?? '';
 
   /// Dialog's type, can be one of `alert`, `beforeunload`, `confirm` or `prompt`.
   DialogType get type => _openingEvent.type;

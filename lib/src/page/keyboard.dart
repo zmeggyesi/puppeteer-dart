@@ -56,7 +56,7 @@ class Keyboard {
   ///
   /// Parameters:
   /// [text]: If specified, generates an input event with this text.
-  Future<void> down(Key key, {String text}) async {
+  Future<void> down(Key key, {String? text}) async {
     var description = _keyDescription(key);
 
     var autoRepeat = _pressedKeys.contains(description.code);
@@ -117,7 +117,7 @@ class Keyboard {
   /// // Types slower, like a user
   /// await page.keyboard.type('World', delay: Duration(milliseconds: 10));
   /// ```
-  Future<void> type(String text, {Duration delay}) async {
+  Future<void> type(String text, {Duration? delay}) async {
     for (var rune in text.runes) {
       var char = String.fromCharCode(rune);
 
@@ -141,7 +141,7 @@ class Keyboard {
   ///
   /// [text]: If specified, generates an input event with this text.
   /// [delay]: Time to wait between `keydown` and `keyup`. Defaults to 0.
-  Future<void> press(Key key, {Duration delay, String text}) async {
+  Future<void> press(Key key, {Duration? delay, String? text}) async {
     await down(key, text: text);
     if (delay != null) {
       await Future.delayed(delay);
@@ -177,11 +177,11 @@ class Keyboard {
 }
 
 class _KeyDescription {
-  String key;
-  int keyCode;
-  String code;
-  String text;
-  KeyLocation location;
+  String? key;
+  int? keyCode;
+  String? code;
+  String? text;
+  KeyLocation? location;
 }
 
 class Key {
@@ -518,9 +518,10 @@ class Key {
   static const Key keyZ =
       Key._(keyCode: 90, code: 'KeyZ', shiftKey: 'Z', key: 'z');
 
-  final int keyCode, shiftKeyCode;
-  final KeyLocation location;
-  final String key, shiftKey, code, text, shiftText;
+  final int? keyCode, shiftKeyCode;
+  final KeyLocation? location;
+  final String key;
+  final String? shiftKey, code, text, shiftText;
 
   static final Map<String, Key> allKeys =
       CanonicalizedMap<String, String, Key>.from({
@@ -679,7 +680,7 @@ class Key {
 
   const Key._(
       {this.keyCode,
-      @required this.key,
+      required this.key,
       this.shiftKey,
       this.shiftKeyCode,
       this.code,

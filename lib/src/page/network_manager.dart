@@ -317,7 +317,7 @@ class Request {
   final FetchApi _fetchApi;
 
   Request(this.client, this.frame, this.interceptionId, this.event,
-      {this.redirectChain, @required bool allowInterception})
+      {this.redirectChain, required bool allowInterception})
       : allowInterception = allowInterception ?? false,
         _fetchApi = FetchApi(client) {
     for (String header in event.request.headers.value.keys) {

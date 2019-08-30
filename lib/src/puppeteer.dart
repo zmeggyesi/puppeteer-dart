@@ -131,7 +131,7 @@ class Puppeteer {
       chromeArgs.add('--remote-debugging-port=0');
     }
 
-    Directory temporaryUserDataDir;
+    Directory? temporaryUserDataDir;
     if (!chromeArgs.any((a) => a.startsWith('--user-data-dir'))) {
       temporaryUserDataDir =
           await Directory.systemTemp.createTemp('puppeteer_dev_profile-');
@@ -338,11 +338,11 @@ class LaunchOptions {
   final List<String> args;
   final DeviceViewport defaultViewport;
 
-  LaunchOptions({@required this.args, @required this.defaultViewport});
+  LaunchOptions({required this.args, required this.defaultViewport});
 
   LaunchOptions replace(
-      {List<String> args,
-      DeviceViewport defaultViewport = viewportNotOverride}) {
+      {List<String>? args,
+      DeviceViewport? defaultViewport = viewportNotOverride}) {
     return LaunchOptions(
         args: args ?? this.args,
         defaultViewport: identical(defaultViewport, viewportNotOverride)

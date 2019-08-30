@@ -17,23 +17,24 @@ class AuditsApi {
   /// [sizeOnly] Whether to only return the size information (defaults to false).
   Future<GetEncodedResponseResult> getEncodedResponse(
       network.RequestId requestId,
-      @Enum(['webp', 'jpeg', 'png']) String encoding,
-      {num quality,
-      bool sizeOnly}) async {
-    assert(const ['webp', 'jpeg', 'png'].contains(encoding));
+      @Enum(['webp', 'jpeg', 'png']) String encoding
+      ,
+      { num? quality, bool? sizeOnly}) async {
+    assert( const ['webp', 'jpeg', 'png'].contains(encoding));
     var result = await _client.send('Audits.getEncodedResponse', {
       'requestId': requestId,
       'encoding': encoding,
-      if (quality != null) 'quality': quality,
-      if (sizeOnly != null) 'sizeOnly': sizeOnly,
+      if (quality != null)'quality': quality,
+      if (sizeOnly != null)'sizeOnly': sizeOnly,
     });
     return GetEncodedResponseResult.fromJson(result);
   }
+
 }
 
 class GetEncodedResponseResult {
   /// The encoded body as a base64 string. Omitted if sizeOnly is true.
-  final String body;
+  final String? body;
 
   /// Size before re-encoding.
   final int originalSize;
@@ -42,7 +43,7 @@ class GetEncodedResponseResult {
   final int encodedSize;
 
   GetEncodedResponseResult(
-      {this.body, @required this.originalSize, @required this.encodedSize});
+      {this.body, required this.originalSize, required this.encodedSize});
 
   factory GetEncodedResponseResult.fromJson(Map<String, dynamic> json) {
     return GetEncodedResponseResult(
@@ -52,3 +53,4 @@ class GetEncodedResponseResult {
     );
   }
 }
+

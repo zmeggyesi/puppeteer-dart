@@ -1,15 +1,15 @@
 import 'dart:async';
 import 'package:meta/meta.dart' show required;
 import '../src/connection.dart';
-import 'io.dart' as io;
 import 'network.dart' as network;
+import 'io.dart' as io;
 import 'page.dart' as page;
 
 /// A domain for letting clients substitute browser's network layer with client code.
 class FetchApi {
-  final Client _client;
+final Client _client;
 
-  FetchApi(this._client);
+FetchApi(this._client);
 
   /// Issued when the domain is enabled and the request URL matches the
   /// specified filter. The request is paused until the client responds
@@ -17,20 +17,24 @@ class FetchApi {
   /// The stage of the request can be determined by presence of responseErrorReason
   /// and responseStatusCode -- the request is at the response stage if either
   /// of these fields is present and in the request stage otherwise.
-  Stream<RequestPausedEvent> get onRequestPaused => _client.onEvent
-      .where((event) => event.name == 'Fetch.requestPaused')
-      .map((event) => RequestPausedEvent.fromJson(event.parameters));
+Stream<RequestPausedEvent> get onRequestPaused => _client.onEvent.where((event) => event.name == 'Fetch.requestPaused')
+.map((event) => RequestPausedEvent.fromJson(event.parameters))
+;
+
 
   /// Issued when the domain is enabled with handleAuthRequests set to true.
   /// The request is paused until client responds with continueWithAuth.
-  Stream<AuthRequiredEvent> get onAuthRequired => _client.onEvent
-      .where((event) => event.name == 'Fetch.authRequired')
-      .map((event) => AuthRequiredEvent.fromJson(event.parameters));
+Stream<AuthRequiredEvent> get onAuthRequired => _client.onEvent.where((event) => event.name == 'Fetch.authRequired')
+.map((event) => AuthRequiredEvent.fromJson(event.parameters))
+;
+
 
   /// Disables the fetch domain.
-  Future<void> disable() async {
-    await _client.send('Fetch.disable');
-  }
+Future<void> disable(
+
+) async {
+ await _client.send('Fetch.disable');
+}
 
   /// Enables issuing of requestPaused events. A request will be paused until client
   /// calls one of failRequest, fulfillRequest or continueRequest/continueWithAuth.
@@ -39,24 +43,21 @@ class FetchApi {
   /// all requests will be affected.
   /// [handleAuthRequests] If true, authRequired events will be issued and requests will be paused
   /// expecting a call to continueWithAuth.
-  Future<void> enable(
-      {List<RequestPattern> patterns, bool handleAuthRequests}) async {
-    await _client.send('Fetch.enable', {
-      if (patterns != null) 'patterns': [...patterns],
-      if (handleAuthRequests != null) 'handleAuthRequests': handleAuthRequests,
-    });
-  }
+Future<void> enable(
+
+{  List<RequestPattern>? patterns,  bool? handleAuthRequests}
+) async {
+ await _client.send('Fetch.enable', {if (patterns != null)'patterns' : [...patterns],if (handleAuthRequests != null)'handleAuthRequests' : handleAuthRequests,});
+}
 
   /// Causes the request to fail with specified reason.
   /// [requestId] An id the client received in requestPaused event.
   /// [errorReason] Causes the request to fail with the given reason.
-  Future<void> failRequest(
-      RequestId requestId, network.ErrorReason errorReason) async {
-    await _client.send('Fetch.failRequest', {
-      'requestId': requestId,
-      'errorReason': errorReason,
-    });
-  }
+Future<void> failRequest(
+  RequestId requestId,  network.ErrorReason errorReason
+) async {
+ await _client.send('Fetch.failRequest', {'requestId' : requestId,'errorReason' : errorReason,});
+}
 
   /// Provides response to the request.
   /// [requestId] An id the client received in requestPaused event.
@@ -65,17 +66,13 @@ class FetchApi {
   /// [body] A response body.
   /// [responsePhrase] A textual representation of responseCode.
   /// If absent, a standard phrase mathcing responseCode is used.
-  Future<void> fulfillRequest(
-      RequestId requestId, int responseCode, List<HeaderEntry> responseHeaders,
-      {String body, String responsePhrase}) async {
-    await _client.send('Fetch.fulfillRequest', {
-      'requestId': requestId,
-      'responseCode': responseCode,
-      'responseHeaders': [...responseHeaders],
-      if (body != null) 'body': body,
-      if (responsePhrase != null) 'responsePhrase': responsePhrase,
-    });
-  }
+Future<void> fulfillRequest(
+  RequestId requestId,  int responseCode,  List<HeaderEntry> responseHeaders
+,
+{  String? body,  String? responsePhrase}
+) async {
+ await _client.send('Fetch.fulfillRequest', {'requestId' : requestId,'responseCode' : responseCode,'responseHeaders' : [...responseHeaders],if (body != null)'body' : body,if (responsePhrase != null)'responsePhrase' : responsePhrase,});
+}
 
   /// Continues the request, optionally modifying some of its parameters.
   /// [requestId] An id the client received in requestPaused event.
@@ -83,30 +80,22 @@ class FetchApi {
   /// [method] If set, the request method is overridden.
   /// [postData] If set, overrides the post data in the request.
   /// [headers] If set, overrides the request headrts.
-  Future<void> continueRequest(RequestId requestId,
-      {String url,
-      String method,
-      String postData,
-      List<HeaderEntry> headers}) async {
-    await _client.send('Fetch.continueRequest', {
-      'requestId': requestId,
-      if (url != null) 'url': url,
-      if (method != null) 'method': method,
-      if (postData != null) 'postData': postData,
-      if (headers != null) 'headers': [...headers],
-    });
-  }
+Future<void> continueRequest(
+  RequestId requestId
+,
+{  String? url,  String? method,  String? postData,  List<HeaderEntry>? headers}
+) async {
+ await _client.send('Fetch.continueRequest', {'requestId' : requestId,if (url != null)'url' : url,if (method != null)'method' : method,if (postData != null)'postData' : postData,if (headers != null)'headers' : [...headers],});
+}
 
   /// Continues a request supplying authChallengeResponse following authRequired event.
   /// [requestId] An id the client received in authRequired event.
   /// [authChallengeResponse] Response to  with an authChallenge.
-  Future<void> continueWithAuth(
-      RequestId requestId, AuthChallengeResponse authChallengeResponse) async {
-    await _client.send('Fetch.continueWithAuth', {
-      'requestId': requestId,
-      'authChallengeResponse': authChallengeResponse,
-    });
-  }
+Future<void> continueWithAuth(
+  RequestId requestId,  AuthChallengeResponse authChallengeResponse
+) async {
+ await _client.send('Fetch.continueWithAuth', {'requestId' : requestId,'authChallengeResponse' : authChallengeResponse,});
+}
 
   /// Causes the body of the response to be received from the server and
   /// returned as a single string. May only be issued for a request that
@@ -115,12 +104,12 @@ class FetchApi {
   /// affect the request or disabling fetch domain before body is received
   /// results in an undefined behavior.
   /// [requestId] Identifier for the intercepted request to get body for.
-  Future<GetResponseBodyResult> getResponseBody(RequestId requestId) async {
-    var result = await _client.send('Fetch.getResponseBody', {
-      'requestId': requestId,
-    });
-    return GetResponseBodyResult.fromJson(result);
-  }
+Future<GetResponseBodyResult> getResponseBody(
+  RequestId requestId
+) async {
+var result =  await _client.send('Fetch.getResponseBody', {'requestId' : requestId,});
+return GetResponseBodyResult.fromJson(result);
+}
 
   /// Returns a handle to the stream representing the response body.
   /// The request must be paused in the HeadersReceived stage.
@@ -132,307 +121,274 @@ class FetchApi {
   /// This method is mutually exclusive with getResponseBody.
   /// Calling other methods that affect the request or disabling fetch
   /// domain before body is received results in an undefined behavior.
-  Future<io.StreamHandle> takeResponseBodyAsStream(RequestId requestId) async {
-    var result = await _client.send('Fetch.takeResponseBodyAsStream', {
-      'requestId': requestId,
-    });
-    return io.StreamHandle.fromJson(result['stream'] as String);
-  }
+Future<io.StreamHandle> takeResponseBodyAsStream(
+  RequestId requestId
+) async {
+var result =  await _client.send('Fetch.takeResponseBodyAsStream', {'requestId' : requestId,});
+return io.StreamHandle.fromJson(result['stream'] as String);
+}
+
 }
 
 class RequestPausedEvent {
   /// Each request the page makes will have a unique id.
-  final RequestId requestId;
+final RequestId requestId;
 
   /// The details of the request.
-  final network.RequestData request;
+final network.RequestData request;
 
   /// The id of the frame that initiated the request.
-  final page.FrameId frameId;
+final page.FrameId frameId;
 
   /// How the requested resource will be used.
-  final network.ResourceType resourceType;
+final network.ResourceType resourceType;
 
   /// Response error if intercepted at response stage.
-  final network.ErrorReason responseErrorReason;
+final network.ErrorReason? responseErrorReason;
 
   /// Response code if intercepted at response stage.
-  final int responseStatusCode;
+final int? responseStatusCode;
 
   /// Response headers if intercepted at the response stage.
-  final List<HeaderEntry> responseHeaders;
+final List<HeaderEntry>? responseHeaders;
 
   /// If the intercepted request had a corresponding Network.requestWillBeSent event fired for it,
   /// then this networkId will be the same as the requestId present in the requestWillBeSent event.
-  final RequestId networkId;
+final RequestId? networkId;
 
-  RequestPausedEvent(
-      {@required this.requestId,
-      @required this.request,
-      @required this.frameId,
-      @required this.resourceType,
-      this.responseErrorReason,
-      this.responseStatusCode,
-      this.responseHeaders,
-      this.networkId});
+RequestPausedEvent({required this.requestId,required this.request,required this.frameId,required this.resourceType,this.responseErrorReason,this.responseStatusCode,this.responseHeaders,this.networkId});
 
-  factory RequestPausedEvent.fromJson(Map<String, dynamic> json) {
-    return RequestPausedEvent(
-      requestId: RequestId.fromJson(json['requestId'] as String),
-      request:
-          network.RequestData.fromJson(json['request'] as Map<String, dynamic>),
-      frameId: page.FrameId.fromJson(json['frameId'] as String),
-      resourceType:
-          network.ResourceType.fromJson(json['resourceType'] as String),
-      responseErrorReason: json.containsKey('responseErrorReason')
-          ? network.ErrorReason.fromJson(json['responseErrorReason'] as String)
-          : null,
-      responseStatusCode: json.containsKey('responseStatusCode')
-          ? json['responseStatusCode'] as int
-          : null,
-      responseHeaders: json.containsKey('responseHeaders')
-          ? (json['responseHeaders'] as List)
-              .map((e) => HeaderEntry.fromJson(e as Map<String, dynamic>))
-              .toList()
-          : null,
-      networkId: json.containsKey('networkId')
-          ? RequestId.fromJson(json['networkId'] as String)
-          : null,
-    );
-  }
+factory RequestPausedEvent.fromJson(Map<String, dynamic> json) {
+return RequestPausedEvent(
+requestId:  RequestId.fromJson(json['requestId'] as String),
+request:  network.RequestData.fromJson(json['request'] as Map<String, dynamic>),
+frameId:  page.FrameId.fromJson(json['frameId'] as String),
+resourceType:  network.ResourceType.fromJson(json['resourceType'] as String),
+responseErrorReason:  json.containsKey('responseErrorReason') ? network.ErrorReason.fromJson(json['responseErrorReason'] as String) : null,
+responseStatusCode:  json.containsKey('responseStatusCode') ? json['responseStatusCode'] as int : null,
+responseHeaders:  json.containsKey('responseHeaders') ? (json['responseHeaders'] as List).map((e) => HeaderEntry.fromJson(e as Map<String, dynamic>)).toList() : null,
+networkId:  json.containsKey('networkId') ? RequestId.fromJson(json['networkId'] as String) : null,
+);
 }
+}
+
 
 class AuthRequiredEvent {
   /// Each request the page makes will have a unique id.
-  final RequestId requestId;
+final RequestId requestId;
 
   /// The details of the request.
-  final network.RequestData request;
+final network.RequestData request;
 
   /// The id of the frame that initiated the request.
-  final page.FrameId frameId;
+final page.FrameId frameId;
 
   /// How the requested resource will be used.
-  final network.ResourceType resourceType;
+final network.ResourceType resourceType;
 
   /// Details of the Authorization Challenge encountered.
   /// If this is set, client should respond with continueRequest that
   /// contains AuthChallengeResponse.
-  final AuthChallenge authChallenge;
+final AuthChallenge authChallenge;
 
-  AuthRequiredEvent(
-      {@required this.requestId,
-      @required this.request,
-      @required this.frameId,
-      @required this.resourceType,
-      @required this.authChallenge});
+AuthRequiredEvent({required this.requestId,required this.request,required this.frameId,required this.resourceType,required this.authChallenge});
 
-  factory AuthRequiredEvent.fromJson(Map<String, dynamic> json) {
-    return AuthRequiredEvent(
-      requestId: RequestId.fromJson(json['requestId'] as String),
-      request:
-          network.RequestData.fromJson(json['request'] as Map<String, dynamic>),
-      frameId: page.FrameId.fromJson(json['frameId'] as String),
-      resourceType:
-          network.ResourceType.fromJson(json['resourceType'] as String),
-      authChallenge:
-          AuthChallenge.fromJson(json['authChallenge'] as Map<String, dynamic>),
-    );
-  }
+factory AuthRequiredEvent.fromJson(Map<String, dynamic> json) {
+return AuthRequiredEvent(
+requestId:  RequestId.fromJson(json['requestId'] as String),
+request:  network.RequestData.fromJson(json['request'] as Map<String, dynamic>),
+frameId:  page.FrameId.fromJson(json['frameId'] as String),
+resourceType:  network.ResourceType.fromJson(json['resourceType'] as String),
+authChallenge:  AuthChallenge.fromJson(json['authChallenge'] as Map<String, dynamic>),
+);
 }
+}
+
 
 class GetResponseBodyResult {
   /// Response body.
-  final String body;
+final String body;
 
   /// True, if content was sent as base64.
-  final bool base64Encoded;
+final bool base64Encoded;
 
-  GetResponseBodyResult({@required this.body, @required this.base64Encoded});
+GetResponseBodyResult({required this.body,required this.base64Encoded});
 
-  factory GetResponseBodyResult.fromJson(Map<String, dynamic> json) {
-    return GetResponseBodyResult(
-      body: json['body'] as String,
-      base64Encoded: json['base64Encoded'] as bool,
-    );
-  }
+factory GetResponseBodyResult.fromJson(Map<String, dynamic> json) {
+return GetResponseBodyResult(
+body:  json['body'] as String,
+base64Encoded:  json['base64Encoded'] as bool,
+);
+}
 }
 
 /// Unique request identifier.
 class RequestId {
-  final String value;
 
-  RequestId(this.value);
+final String value;
 
-  factory RequestId.fromJson(String value) => RequestId(value);
+RequestId(this.value);
 
-  String toJson() => value;
+factory RequestId.fromJson(String value) => RequestId(value);
 
-  @override
-  bool operator ==(other) =>
-      (other is RequestId && other.value == value) || value == other;
+String toJson() => value;
 
-  @override
-  int get hashCode => value.hashCode;
+@override
+bool operator ==(other) => (other is RequestId && other.value == value) || value == other;
 
-  @override
-  String toString() => value.toString();
+@override
+int get hashCode => value.hashCode;
+
+@override
+String toString() => value.toString();
 }
 
 /// Stages of the request to handle. Request will intercept before the request is
 /// sent. Response will intercept after the response is received (but before response
 /// body is received.
 class RequestStage {
-  static const request = RequestStage._('Request');
-  static const response = RequestStage._('Response');
-  static const values = {
-    'Request': request,
-    'Response': response,
-  };
+static const request = RequestStage._('Request');
+static const response = RequestStage._('Response');
+static const values = {
+'Request': request,
+'Response': response,
+};
 
-  final String value;
+final String value;
 
-  const RequestStage._(this.value);
+const RequestStage._(this.value);
 
-  factory RequestStage.fromJson(String value) => values[value];
+factory RequestStage.fromJson(String value) => values[value];
 
-  String toJson() => value;
+String toJson() => value;
 
-  @override
-  bool operator ==(other) =>
-      (other is RequestStage && other.value == value) || value == other;
+@override
+bool operator ==(other) => (other is RequestStage && other.value == value) || value == other;
 
-  @override
-  int get hashCode => value.hashCode;
+@override
+int get hashCode => value.hashCode;
 
-  @override
-  String toString() => value.toString();
+@override
+String toString() => value.toString();
 }
+
 
 class RequestPattern {
   /// Wildcards ('*' -> zero or more, '?' -> exactly one) are allowed. Escape character is
   /// backslash. Omitting is equivalent to "*".
-  final String urlPattern;
+final String? urlPattern;
 
   /// If set, only requests for matching resource types will be intercepted.
-  final network.ResourceType resourceType;
+final network.ResourceType? resourceType;
 
   /// Stage at wich to begin intercepting requests. Default is Request.
-  final RequestStage requestStage;
+final RequestStage? requestStage;
 
-  RequestPattern({this.urlPattern, this.resourceType, this.requestStage});
+RequestPattern({this.urlPattern,this.resourceType,this.requestStage});
 
-  factory RequestPattern.fromJson(Map<String, dynamic> json) {
-    return RequestPattern(
-      urlPattern:
-          json.containsKey('urlPattern') ? json['urlPattern'] as String : null,
-      resourceType: json.containsKey('resourceType')
-          ? network.ResourceType.fromJson(json['resourceType'] as String)
-          : null,
-      requestStage: json.containsKey('requestStage')
-          ? RequestStage.fromJson(json['requestStage'] as String)
-          : null,
-    );
-  }
+factory RequestPattern.fromJson(Map<String, dynamic> json) {
+return RequestPattern(
+urlPattern:  json.containsKey('urlPattern') ? json['urlPattern'] as String : null,
+resourceType:  json.containsKey('resourceType') ? network.ResourceType.fromJson(json['resourceType'] as String) : null,
+requestStage:  json.containsKey('requestStage') ? RequestStage.fromJson(json['requestStage'] as String) : null,
+);
+}
 
-  Map<String, dynamic> toJson() {
-    return {
-      if (urlPattern != null) 'urlPattern': urlPattern,
-      if (resourceType != null) 'resourceType': resourceType.toJson(),
-      if (requestStage != null) 'requestStage': requestStage.toJson(),
-    };
-  }
+Map<String, dynamic> toJson() {
+return {
+if (urlPattern != null) 
+'urlPattern' : urlPattern,
+if (resourceType != null) 
+'resourceType' : resourceType.toJson(),
+if (requestStage != null) 
+'requestStage' : requestStage.toJson(),
+};}
 }
 
 /// Response HTTP header entry
 class HeaderEntry {
-  final String name;
 
-  final String value;
+final String name;
 
-  HeaderEntry({@required this.name, @required this.value});
 
-  factory HeaderEntry.fromJson(Map<String, dynamic> json) {
-    return HeaderEntry(
-      name: json['name'] as String,
-      value: json['value'] as String,
-    );
-  }
+final String value;
 
-  Map<String, dynamic> toJson() {
-    return {
-      'name': name,
-      'value': value,
-    };
-  }
+HeaderEntry({required this.name,required this.value});
+
+factory HeaderEntry.fromJson(Map<String, dynamic> json) {
+return HeaderEntry(
+name:  json['name'] as String,
+value:  json['value'] as String,
+);
+}
+
+Map<String, dynamic> toJson() {
+return {
+'name': name,
+'value': value,
+};}
 }
 
 /// Authorization challenge for HTTP status code 401 or 407.
 class AuthChallenge {
   /// Source of the authentication challenge.
-  final AuthChallengeSource source;
+final AuthChallengeSource? source;
 
   /// Origin of the challenger.
-  final String origin;
+final String origin;
 
   /// The authentication scheme used, such as basic or digest
-  final String scheme;
+final String scheme;
 
   /// The realm of the challenge. May be empty.
-  final String realm;
+final String realm;
 
-  AuthChallenge(
-      {this.source,
-      @required this.origin,
-      @required this.scheme,
-      @required this.realm});
+AuthChallenge({this.source,required this.origin,required this.scheme,required this.realm});
 
-  factory AuthChallenge.fromJson(Map<String, dynamic> json) {
-    return AuthChallenge(
-      source: json.containsKey('source')
-          ? AuthChallengeSource.fromJson(json['source'] as String)
-          : null,
-      origin: json['origin'] as String,
-      scheme: json['scheme'] as String,
-      realm: json['realm'] as String,
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'origin': origin,
-      'scheme': scheme,
-      'realm': realm,
-      if (source != null) 'source': source,
-    };
-  }
+factory AuthChallenge.fromJson(Map<String, dynamic> json) {
+return AuthChallenge(
+source:  json.containsKey('source') ? AuthChallengeSource.fromJson(json['source'] as String) : null,
+origin:  json['origin'] as String,
+scheme:  json['scheme'] as String,
+realm:  json['realm'] as String,
+);
 }
 
+Map<String, dynamic> toJson() {
+return {
+'origin': origin,
+'scheme': scheme,
+'realm': realm,
+if (source != null) 
+'source' : source,
+};}
+}
+
+
 class AuthChallengeSource {
-  static const server = AuthChallengeSource._('Server');
-  static const proxy = AuthChallengeSource._('Proxy');
-  static const values = {
-    'Server': server,
-    'Proxy': proxy,
-  };
+static const server = AuthChallengeSource._('Server');
+static const proxy = AuthChallengeSource._('Proxy');
+static const values = {
+'Server': server,
+'Proxy': proxy,
+};
 
-  final String value;
+final String value;
 
-  const AuthChallengeSource._(this.value);
+const AuthChallengeSource._(this.value);
 
-  factory AuthChallengeSource.fromJson(String value) => values[value];
+factory AuthChallengeSource.fromJson(String value) => values[value];
 
-  String toJson() => value;
+String toJson() => value;
 
-  @override
-  bool operator ==(other) =>
-      (other is AuthChallengeSource && other.value == value) || value == other;
+@override
+bool operator ==(other) => (other is AuthChallengeSource && other.value == value) || value == other;
 
-  @override
-  int get hashCode => value.hashCode;
+@override
+int get hashCode => value.hashCode;
 
-  @override
-  String toString() => value.toString();
+@override
+String toString() => value.toString();
 }
 
 /// Response to an AuthChallenge.
@@ -440,66 +396,62 @@ class AuthChallengeResponse {
   /// The decision on what to do in response to the authorization challenge.  Default means
   /// deferring to the default behavior of the net stack, which will likely either the Cancel
   /// authentication or display a popup dialog box.
-  final AuthChallengeResponseResponse response;
+final AuthChallengeResponseResponse response;
 
   /// The username to provide, possibly empty. Should only be set if response is
   /// ProvideCredentials.
-  final String username;
+final String? username;
 
   /// The password to provide, possibly empty. Should only be set if response is
   /// ProvideCredentials.
-  final String password;
+final String? password;
 
-  AuthChallengeResponse(
-      {@required this.response, this.username, this.password});
+AuthChallengeResponse({required this.response,this.username,this.password});
 
-  factory AuthChallengeResponse.fromJson(Map<String, dynamic> json) {
-    return AuthChallengeResponse(
-      response:
-          AuthChallengeResponseResponse.fromJson(json['response'] as String),
-      username:
-          json.containsKey('username') ? json['username'] as String : null,
-      password:
-          json.containsKey('password') ? json['password'] as String : null,
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'response': response,
-      if (username != null) 'username': username,
-      if (password != null) 'password': password,
-    };
-  }
+factory AuthChallengeResponse.fromJson(Map<String, dynamic> json) {
+return AuthChallengeResponse(
+response:  AuthChallengeResponseResponse.fromJson(json['response'] as String),
+username:  json.containsKey('username') ? json['username'] as String : null,
+password:  json.containsKey('password') ? json['password'] as String : null,
+);
 }
+
+Map<String, dynamic> toJson() {
+return {
+'response': response,
+if (username != null) 
+'username' : username,
+if (password != null) 
+'password' : password,
+};}
+}
+
 
 class AuthChallengeResponseResponse {
-  static const default$ = AuthChallengeResponseResponse._('Default');
-  static const cancelAuth = AuthChallengeResponseResponse._('CancelAuth');
-  static const provideCredentials =
-      AuthChallengeResponseResponse._('ProvideCredentials');
-  static const values = {
-    'Default': default$,
-    'CancelAuth': cancelAuth,
-    'ProvideCredentials': provideCredentials,
-  };
+static const default$ = AuthChallengeResponseResponse._('Default');
+static const cancelAuth = AuthChallengeResponseResponse._('CancelAuth');
+static const provideCredentials = AuthChallengeResponseResponse._('ProvideCredentials');
+static const values = {
+'Default': default$,
+'CancelAuth': cancelAuth,
+'ProvideCredentials': provideCredentials,
+};
 
-  final String value;
+final String value;
 
-  const AuthChallengeResponseResponse._(this.value);
+const AuthChallengeResponseResponse._(this.value);
 
-  factory AuthChallengeResponseResponse.fromJson(String value) => values[value];
+factory AuthChallengeResponseResponse.fromJson(String value) => values[value];
 
-  String toJson() => value;
+String toJson() => value;
 
-  @override
-  bool operator ==(other) =>
-      (other is AuthChallengeResponseResponse && other.value == value) ||
-      value == other;
+@override
+bool operator ==(other) => (other is AuthChallengeResponseResponse && other.value == value) || value == other;
 
-  @override
-  int get hashCode => value.hashCode;
+@override
+int get hashCode => value.hashCode;
 
-  @override
-  String toString() => value.toString();
+@override
+String toString() => value.toString();
 }
+

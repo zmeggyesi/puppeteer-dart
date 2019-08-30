@@ -44,7 +44,7 @@ String replaceExamples(String sourceFile, List<CodeSnippet> snippets) {
       var comment = member.documentationComment;
 
       if (comment != null) {
-        String memberName;
+        String? memberName;
         if (member is MethodDeclaration) {
           memberName = member.name.name;
         } else if (member is ConstructorDeclaration) {

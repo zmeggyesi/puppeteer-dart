@@ -10,7 +10,7 @@ main() async {
   print(pageContent);
 
   // Or get the content directly by executing some Javascript
-  var pageContent2 = await page.evaluate('document.documentElement.outerHTML');
+  String pageContent2 = await page.evaluate('document.documentElement.outerHTML');
   print(pageContent2);
 
   await browser.close();
