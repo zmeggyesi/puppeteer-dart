@@ -72,6 +72,7 @@ Future _downloadFile(String url, String output) async {
     throw Exception('File was not downloaded from $url to $output');
   } else {
     print("Downloaded Chrome from $url to $output...");
+  }
 }
 
 void _unzip(String path, String targetPath) {
