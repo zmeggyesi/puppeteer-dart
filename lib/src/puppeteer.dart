@@ -306,6 +306,7 @@ Future<String> _waitForWebSocketUrl(Process chromeProcess) async {
       .transform(Utf8Decoder())
       .transform(LineSplitter())) {
     _logger.warning('[Chrome stderr]: $line');
+    print('Message from Chrome process: $line');
     var match = _devToolRegExp.firstMatch(line);
     if (match != null) {
       return match.group(1)!;
