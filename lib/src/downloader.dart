@@ -35,7 +35,7 @@ Future<RevisionInfo> downloadChrome({int? revision, String? cachePath}) async {
     var zipPath = p.join(cachePath, '${revision}_${p.url.basename(url)}');
     await _downloadFile(url, zipPath);
     
-    print('File exists at $zipPath: ${zipPath.existsSync()}');
+    print('File exists at $zipPath: ${File(zipPath).existsSync()}');
     
     _unzip(zipPath, revisionDirectory.path);
     File(zipPath).deleteSync();
