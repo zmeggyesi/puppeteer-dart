@@ -34,6 +34,9 @@ Future<RevisionInfo> downloadChrome({int? revision, String? cachePath}) async {
     var url = _downloadUrl(revision);
     var zipPath = p.join(cachePath, '${revision}_${p.url.basename(url)}');
     await _downloadFile(url, zipPath);
+    
+    print('File exists at $zipPath: ${zipPath.existsSync()}');
+    
     _unzip(zipPath, revisionDirectory.path);
     File(zipPath).deleteSync();
   }
@@ -67,7 +70,8 @@ Future _downloadFile(String url, String output) async {
 
   if (!ouputFile.existsSync() || ouputFile.lengthSync() == 0) {
     throw Exception('File was not downloaded from $url to $output');
-  }
+  } else {
+    print("Downloaded Chrome from $url to $ output...");
 }
 
 void _unzip(String path, String targetPath) {
